@@ -145,7 +145,7 @@ public class GenerateService implements IGenerateService {
             filePath = classPath + "\\" + className + "Mapper.java";
             String dataTime = DatetimeUtil.dateTime();
             String header = CODE_TEMPLATE.replace("${name}", className + "Mapper").replace("${datetime}", dataTime).replace("${package}", packageName);
-            String importDomain = "\nimport " + PACKAGE_NAME + "." + className + ";\n";
+            String importDomain = "\nimport " + PACKAGE_NAME + ".domain." + className + ";\n";
             return FileUtil.createClassFile(header + importDomain + sql.getMapper(), filePath);
         }
         return false;
