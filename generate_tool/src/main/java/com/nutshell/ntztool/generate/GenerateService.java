@@ -24,6 +24,8 @@ import java.util.List;
  */
 public class GenerateService implements IGenerateService {
 
+    private static final String PACKAGE_NAME = ResourceUtils.getProject().getPackageName();
+
     @Override
     public boolean generateFile(String path) {
         List<TableInfo> tableInfoList = DbInfoDao.getInstance().showTables();
@@ -110,15 +112,13 @@ public class GenerateService implements IGenerateService {
             getSet.append("     * 设置 ").append(columnInfo.getColumnName()).append(" 属性\n");
             getSet.append("     * @param ").append(clsPro).append(" ").append(columnInfo.getColumnComment()).append("\n");
             getSet.append("     */\n");
-            getSet.append("    public void ").append(setName).append("(").append(columnInfo.getDataType())
-                    .append(" ").append(clsPro).append(") {\n");
-            getSet.append("        this.").append(clsPro).append("=").append(clsPro)
-                    .append(";\n");
+            getSet.append("    public void ").append(setName).append("(").append(columnInfo.getDataType()).append(" ").append(clsPro).append(") {\n");
+            getSet.append("        this.").append(clsPro).append("=").append(clsPro).append(";\n");
             getSet.append("    }\n\n");
         }
         builder.append(getSet);
         builder.append("}");
-        String packageName = ResourceUtils.getProject().getPackageName() + ".domain";
+        String packageName = PACKAGE_NAME + ".domain";
         classPath = FileUtil.createJavaFolder(classPath, packageName);
         String filePath = classPath + "\\" + className + ".java";
         String header = CODE_TEMPLATE.replace("${name}", className).replace("${datetime}", dataTime).replace("${package}", packageName);
@@ -136,31 +136,30 @@ public class GenerateService implements IGenerateService {
         StringBuilder xmlContent = new StringBuilder();
         xmlContent.append(sql.getInsertSql()).append(sql.getUpdateSql()).append(sql.getSelectAllSql()).
                 append(sql.getSelectSql()).append(sql.getDeleteSql());
-        String content = MYBATIS_XML.replace("${mappername}", ResourceUtils.getProject().getPackageName() + "." + className + "Mapper")
-                .replace("${sqlconetnt}", xmlContent);
-        String xmlPath = FileUtil.createXmlFolder(classPath, ResourceUtils.getProject().getPackageName() + ".domain");
-        String filePath = xmlPath + "\\" + className + ".xml";
+        String packageName = PACKAGE_NAME + ".persistence";
+        String content = MYBATIS_XML.replace("${mappername}", packageName + "." + className + "Mapper").replace("${sqlconetnt}", xmlContent);
+        String xmlPath = FileUtil.createXmlFolder(classPath, packageName);
+        String filePath = xmlPath + "\\" + className + "Mapper.xml";
         if (FileUtil.createClassFile(content, filePath)) {
-            String packageName = ResourceUtils.getProject().getPackageName() + ".mapper";
             classPath = FileUtil.createJavaFolder(classPath, packageName);
             filePath = classPath + "\\" + className + "Mapper.java";
             String dataTime = DatetimeUtil.dateTime();
             String header = CODE_TEMPLATE.replace("${name}", className + "Mapper").replace("${datetime}", dataTime).replace("${package}", packageName);
-            return FileUtil.createClassFile(header + sql.getMapper(), filePath);
+            String importDomain = "\nimport " + PACKAGE_NAME + "." + className + ";\n";
+            return FileUtil.createClassFile(header + importDomain + sql.getMapper(), filePath);
         }
         return false;
     }
-
     /**
      * MYBATIS的配置文件
      */
     private static final String MYBATIS_XML =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                    "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \n" +
-                    "\"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                    "<mapper namespace=\"${mappername}\">\n\n" +
-                    "   <cache />\n\n" +
-                    "${sqlconetnt}\n</mapper>";
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \n"
+            + "\"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n"
+            + "<mapper namespace=\"${mappername}\">\n\n"
+            + "   <cache />\n\n"
+            + "${sqlconetnt}\n</mapper>";
 
     /**
      * 创建SQL脚本.
@@ -192,8 +191,7 @@ public class GenerateService implements IGenerateService {
         mapper.append("public interface ").append(clsName).append("Mapper {\n");
         //插入语句
         String inserId = StringUtil.sqlName("insert", clsName);
-        insert.append("    <select id=\"").append(inserId)
-                .append("\" parameterType=\"").append(clsName).append("\">\n");
+        insert.append("    <insert id=\"").append(inserId).append("\" parameterType=\"").append(clsName).append("\">\n");
         insert.append("      INSERT INTO ").append(tableName);
         insert.append("(\n");
 
@@ -202,8 +200,7 @@ public class GenerateService implements IGenerateService {
         mapper.append("     * @param ").append(clsName.toLowerCase()).append(" ").append(tableName).append("信息\n");
         mapper.append("     * @return 返回大于0的数字表示数据库新增成功，否则表示新增失败\n");
         mapper.append("     */\n");
-        mapper.append("    int ").append(inserId).append("(").append(clsName).append(" ")
-                .append(clsName.toLowerCase()).append(");\n");
+        mapper.append("    int ").append(inserId).append("(").append(clsName).append(" ").append(clsName.toLowerCase()).append(");\n");
         //删除语句
         String delteId = StringUtil.sqlName("delete", clsName);
         delete.append("    <delete id=\"").append(delteId).append("\" parameterType=\"");
@@ -236,39 +233,33 @@ public class GenerateService implements IGenerateService {
             //删除主键
             if (columnInfo.getColumnKey().equals("PRI")) {//主键
                 pri = true;
+                selectSql.append("          ").append(columnName).append(",\n");
                 delete.append(columnInfo.getDataType()).append("\">\n");
-                delete.append("         DELETE FROM ").append(tableName).append(" WHERE ")
-                        .append(columnName).append(" = #{").append(clsPro).append("}\n");
+                delete.append("         DELETE FROM ").append(tableName).append(" WHERE ").append(columnName).append(" = #{").append(clsPro).append("}\n");
                 delete.append("    </delete>");
                 selectOne.append(" parameterType=\"").append(columnInfo.getDataType()).append("\">\n");
                 wherePRI = "         WHERE " + columnName + "=#{" + clsPro + "}\n";
 
                 mapper.append("    /**\n");
                 mapper.append("     * 根据给定的主键值取得表").append(tableName).append("对应的数据信息。\n");
-                mapper.append("     * @param ").append(columnInfo.getColumnName().toLowerCase()).append(" 表")
-                        .append(columnInfo.getColumnName()).append("主键值\n");
-                mapper.append("     * @return 主键为<code>").append(columnInfo.getColumnName().toLowerCase())
-                        .append("</code>").append("的数据信息\n");
+                mapper.append("     * @param ").append(columnInfo.getColumnName().toLowerCase()).append(" 表").append(columnInfo.getColumnName()).append("主键值\n");
+                mapper.append("     * @return 主键为<code>").append(columnInfo.getColumnName().toLowerCase()).append("</code>").append("的数据信息\n");
                 mapper.append("     */\n");
-                mapper.append("    ").append(clsName).append(" ").append(selectOneId).append("(")
-                        .append(columnInfo.getDataType()).append(" ")
-                        .append(columnInfo.getColumnName().toLowerCase()).append(");\n");
+                mapper.append("    ").append(clsName).append(" ").append(selectOneId).append("(").append(columnInfo.getDataType()).append(" ").append(columnInfo.getColumnName().toLowerCase()).append(");\n");
 
                 mapper.append("    /**\n");
                 mapper.append("     * 根据给定的主键值向数据库表").append(tableName).append("删除一条信息。\n");
                 mapper.append("     * @param ").append(columnInfo.getColumnName().toLowerCase()).append(" 表").append(columnInfo.getColumnName()).append("主键值\n");
                 mapper.append("     * @return 返回大于0的数字表示数据库删除成功，否则表示删除失败\n");
                 mapper.append("     */\n");
-                mapper.append("    int ").append(delteId).append("(").append(columnInfo.getDataType()).append(" ")
-                        .append(columnInfo.getColumnName().toLowerCase()).append(");\n");
+                mapper.append("    int ").append(delteId).append("(").append(columnInfo.getDataType()).append(" ").append(columnInfo.getColumnName().toLowerCase()).append(");\n");
 
                 mapper.append("    /**\n");
                 mapper.append("     * 根据给定的主键值更新数据库表").append(tableName).append("的一条信息。\n");
                 mapper.append("     * @param ").append(clsName.toLowerCase()).append(" 包含主键值的").append(tableName).append("数据信息\n");
                 mapper.append("     * @return 返回大于0的数字表示数据库更新成功，否则表示更新失败\n");
                 mapper.append("     */\n");
-                mapper.append("    int ").append(updateId).append("(").append(clsName).append(" ")
-                        .append(clsName.toLowerCase()).append(");\n");
+                mapper.append("    int ").append(updateId).append("(").append(clsName).append(" ").append(clsName.toLowerCase()).append(");\n");
             } else {
                 proBuilder.append("         #{").append(clsPro).append("},\n");
 
@@ -312,18 +303,17 @@ public class GenerateService implements IGenerateService {
         sql.setMapper(mapper.toString());
         return sql;
     }
-
-
     /**
      * 头文件
      */
-    private static final String CODE_TEMPLATE = "/*\n" +
-            " * Copyright (c) 2010-2011 NutShell.\n" +
-            " * [Project:" + ResourceUtils.getProject().getProjectName() + ",Id:${name}.java  ${datetime} " + ResourceUtils.getProject().getUser() + " ]\n" +
-            " */\n" +
-            "package ${package};\n";
+    private static final String CODE_TEMPLATE = "/*\n"
+            + " * Copyright (c) 2010-2011 NutShell.\n"
+            + " * [Project:" + ResourceUtils.getProject().getProjectName() + ",Id:${name}.java  ${datetime} " + ResourceUtils.getProject().getUser() + " ]\n"
+            + " */\n"
+            + "package ${package};\n";
 
     static class Sql {
+
         private String insertSql;
         private String updateSql;
         private String deleteSql;
