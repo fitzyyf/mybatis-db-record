@@ -1,0 +1,6 @@
+2011年6月10日：
+更新以下几个问题：
+1、工具生成时候：mybatis的xml文件中的namespace生成不正确。
+2、查询语句 主键字段没有生成在查询语句中。
+3、Mybatis创建的xml名字没有加入Mapper。
+4、Mybatis中的Mapper中的实体没有导入。
