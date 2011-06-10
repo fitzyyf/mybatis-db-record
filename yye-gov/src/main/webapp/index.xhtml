@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+</h:head>
+
+<h:body>
+    <h:form>
+        <fieldset>
+            <h3>Create a new link:</h3>
+            <h:outputLabel for="url"> Link URL: <h:messages for="url"/><br/>
+            </h:outputLabel>
+            <h:inputText id="url" value="#{testBean.test.name}"/>
+            <br/>
+        </fieldset>
+        <h:commandButton action="#{testBean.createLink}" value="Create"/>
+        <br/>
+
+        <ui:repeat value="#{testBean.testList}" var="link">
+            <h:link outcome="/index" value="#{link.name}">
+                <f:param name="name" value="#{link.name}"/>
+            </h:link>
+            <br/>
+        </ui:repeat>
+        <h:commandButton value="清空" action="#{testBean.delteLink}"/>
+    </h:form>
+</h:body>
+
+</html>
+
