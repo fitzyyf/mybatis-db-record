@@ -98,7 +98,7 @@ public class MapperUtil {
         mapper.append("     *         如果要获取全部，则传递一个空的Map即可。\n");
         mapper.append("     */\n");
         mapper.append("    List<").append(domainName).append("> ").append(selectOwnMethod)
-                .append("(Map<String,String> limitParamt);\n\n");
+                .append("(Map<String,Object> limitParamt);\n\n");
         return mapper.toString();
     }
 
