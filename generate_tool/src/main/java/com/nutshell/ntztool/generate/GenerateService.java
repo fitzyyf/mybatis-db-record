@@ -5,6 +5,7 @@
 package com.nutshell.ntztool.generate;
 
 import com.nutshell.ntztool.db.DbInfoDao;
+import com.nutshell.ntztool.generate.mybatis.MapperUtil;
 import com.nutshell.ntztool.model.ColumnInfo;
 import com.nutshell.ntztool.model.TableInfo;
 import com.nutshell.ntztool.util.DatetimeUtil;
@@ -135,90 +136,84 @@ public class GenerateService implements IGenerateService {
         Sql sql = createSql(tableInfo, className);
         StringBuilder xmlContent = new StringBuilder();
         xmlContent.append(sql.getInsertSql()).append(sql.getUpdateSql()).append(sql.getSelectAllSql()).
-                append(sql.getSelectSql()).append(sql.getDeleteSql());
+                append(sql.getCountQuerySql()).append(sql.getSelectSql()).append(sql.getDeleteSql());
         String packageName = PACKAGE_NAME + ".persistence";
-        String content = MYBATIS_XML.replace("${mappername}", packageName + "." + className + "Mapper").replace("${sqlconetnt}", xmlContent);
+        String content = MYBATIS_XML.replace("${mappername}", packageName + "." + className + "Mapper")
+                .replace("${sqlconetnt}", xmlContent);
         String xmlPath = FileUtil.createXmlFolder(classPath, packageName);
         String filePath = xmlPath + "\\" + className + "Mapper.xml";
         if (FileUtil.createClassFile(content, filePath)) {
             classPath = FileUtil.createJavaFolder(classPath, packageName);
             filePath = classPath + "\\" + className + "Mapper.java";
             String dataTime = DatetimeUtil.dateTime();
-            String header = CODE_TEMPLATE.replace("${name}", className + "Mapper").replace("${datetime}", dataTime).replace("${package}", packageName);
-            String importDomain = "\nimport " + PACKAGE_NAME + ".domain." + className + ";\n";
+            String header = CODE_TEMPLATE.replace("${name}", className + "Mapper").replace("${datetime}", dataTime)
+                    .replace("${package}", packageName);
+            String importDomain = new StringBuilder().append("\nimport ").append(PACKAGE_NAME).append(".domain.")
+                    .append(className).append(";\n").append("import java.util.List;\nimport java.util.Map;\n").toString();
             return FileUtil.createClassFile(header + importDomain + sql.getMapper(), filePath);
         }
         return false;
     }
+
     /**
      * MYBATIS的配置文件
      */
     private static final String MYBATIS_XML =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \n"
-            + "\"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n"
-            + "<mapper namespace=\"${mappername}\">\n\n"
-            + "   <cache />\n\n"
-            + "${sqlconetnt}\n</mapper>";
+                    + "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \n"
+                    + "\"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n"
+                    + "<mapper namespace=\"${mappername}\">\n\n"
+                    + "   <cache />\n\n"
+                    + "${sqlconetnt}\n</mapper>";
 
     /**
      * 创建SQL脚本.
      *
-     * @param tableInfo 表格属性
-     * @param clsName   类型
+     * @param tableInfo  表格属性
+     * @param domainName 对应实体类
      * @return sql语句
      */
-    private static Sql createSql(TableInfo tableInfo, String clsName) {
+    private static Sql createSql(TableInfo tableInfo, String domainName) {
         Sql sql = new Sql();
         StringBuilder insert = new StringBuilder();//insert语句
         StringBuilder update = new StringBuilder();//update语句
         StringBuilder delete = new StringBuilder();//delete语句
         StringBuilder selectOne = new StringBuilder();//查询单个语句
         StringBuilder selectAll = new StringBuilder();//查询所有的语句
-
-        StringBuilder mapper = new StringBuilder();
+        StringBuilder selectCount = new StringBuilder();//查询统计语句
+        StringBuilder mapper = new StringBuilder(); //mapper接口代码
         String tableName = tableInfo.getTableName().toUpperCase();
-        //
-        String dataTime = DatetimeUtil.dateTime();
-        mapper.append("/**\n");
-        mapper.append(" * ").append(tableInfo.getTableComment()).append(" Mybatis接口类\n");
-        mapper.append(" * <br/>\n");
-        mapper.append(" * \n");
-        mapper.append(" * @author ").append(ResourceUtils.getProject().getUser()).append("\n");
-        mapper.append(" * @version 1.0 ").append(dataTime).append("\n");
-        mapper.append(" * @since JDK 1.0\n");
-        mapper.append(" */\n");
-        mapper.append("public interface ").append(clsName).append("Mapper {\n");
-        //插入语句
-        String inserId = StringUtil.sqlName("insert", clsName);
-        insert.append("    <insert id=\"").append(inserId).append("\" parameterType=\"").append(clsName).append("\">\n");
+
+        //开始创建各个语句的Mapper接口对应的方法*//
+        String insertMethod = StringUtil.sqlName("insert", domainName);
+        String delteId = StringUtil.sqlName("delete", domainName);
+        String selectOneId = StringUtil.sqlName("selectOne", domainName);
+        String selectOwnMethod = StringUtil.sqlName("selectOwn", domainName);
+        String updateId = StringUtil.sqlName("update", domainName);
+        String recordCountMethod = StringUtil.sqlName("count", domainName);
+        //结束创建mapper方法
+        mapper.append(MapperUtil.generateFacesMapper(tableInfo.getTableComment(), domainName));
+        //插入SQL的Mybatis配置语句
+        insert.append("    <insert id=\"").append(insertMethod).append("\" parameterType=\"").append(domainName).append("\">\n");
         insert.append("      INSERT INTO ").append(tableName);
         insert.append("(\n");
 
-        mapper.append("    /**\n");
-        mapper.append("     * 向数据库表").append(tableName).append("增加一条信息。\n");
-        mapper.append("     * @param ").append(clsName.toLowerCase()).append(" ").append(tableName).append("信息\n");
-        mapper.append("     * @return 返回大于0的数字表示数据库新增成功，否则表示新增失败\n");
-        mapper.append("     */\n");
-        mapper.append("    int ").append(inserId).append("(").append(clsName).append(" ").append(clsName.toLowerCase()).append(");\n");
+        mapper.append(MapperUtil.generateInsertMethod(tableName, domainName, insertMethod));
         //删除语句
-        String delteId = StringUtil.sqlName("delete", clsName);
         delete.append("    <delete id=\"").append(delteId).append("\" parameterType=\"");
         //查询语句
-        String selectOneId = StringUtil.sqlName("selectOne", clsName);
-        String selectOwnId = StringUtil.sqlName("selectOwn", clsName);
         selectOne.append("      <select id=\"").append(selectOneId).append("\" ");
-        selectAll.append("      <select id=\"").append(selectOwnId).
-                append("\" resultType=\"").append(clsName).append("\">\n");
-        mapper.append("    /**\n");
-        mapper.append("     * 取得表").append(tableName).append("所有的信息。\n");
-        mapper.append("     * @return ").append(tableName).append("的所有信息列表\n");
-        mapper.append("     */\n");
-        mapper.append("    java.util.List<").append(clsName).append("> ").append(selectOwnId).append("();\n");
+        selectAll.append("      <select id=\"").append(selectOwnMethod).
+                append("\" resultType=\"").append(domainName)
+                .append("\" parameterType=\"map\">\n");
+        selectCount.append("      <select id=\"").append(recordCountMethod).append("\" resultType=\"long\">\n");
+
+        mapper.append(MapperUtil.generateRecordCountMehod(tableName, recordCountMethod));
+
+        mapper.append(MapperUtil.generateSelectOwnRecordMethod(tableName, domainName, selectOwnMethod));
         //update语句
-        String updateId = StringUtil.sqlName("update", clsName);
         update.append("     <update id=\"").append(updateId).append("\"  parameterType=\"").
-                append(clsName).append("\">\n");
+                append(domainName).append("\">\n");
         update.append("         UPDATE ").append(tableName).append(" SET \n");
 
         String clsPro;//类属性名称
@@ -226,40 +221,21 @@ public class GenerateService implements IGenerateService {
         StringBuilder selectSql = new StringBuilder();
         selectSql.append("          SELECT\n");
         String wherePRI = "", columnName;
-        boolean pri = false;
+        ColumnInfo priColumn = null;//主键列
         for (ColumnInfo columnInfo : tableInfo.getColumnList()) {
             clsPro = StringUtil.columnToPropertis(columnInfo.getColumnName());
             columnName = columnInfo.getColumnName().toUpperCase();
-            //删除主键
             if (columnInfo.getColumnKey().equals("PRI")) {//主键
-                pri = true;
+                priColumn = columnInfo;//当前为主键
+                priColumn.setColumnName(columnName);
+                //查询语句
                 selectSql.append("          ").append(columnName).append(",\n");
+
                 delete.append(columnInfo.getDataType()).append("\">\n");
                 delete.append("         DELETE FROM ").append(tableName).append(" WHERE ").append(columnName).append(" = #{").append(clsPro).append("}\n");
                 delete.append("    </delete>");
                 selectOne.append(" parameterType=\"").append(columnInfo.getDataType()).append("\">\n");
                 wherePRI = "         WHERE " + columnName + "=#{" + clsPro + "}\n";
-
-                mapper.append("    /**\n");
-                mapper.append("     * 根据给定的主键值取得表").append(tableName).append("对应的数据信息。\n");
-                mapper.append("     * @param ").append(columnInfo.getColumnName().toLowerCase()).append(" 表").append(columnInfo.getColumnName()).append("主键值\n");
-                mapper.append("     * @return 主键为<code>").append(columnInfo.getColumnName().toLowerCase()).append("</code>").append("的数据信息\n");
-                mapper.append("     */\n");
-                mapper.append("    ").append(clsName).append(" ").append(selectOneId).append("(").append(columnInfo.getDataType()).append(" ").append(columnInfo.getColumnName().toLowerCase()).append(");\n");
-
-                mapper.append("    /**\n");
-                mapper.append("     * 根据给定的主键值向数据库表").append(tableName).append("删除一条信息。\n");
-                mapper.append("     * @param ").append(columnInfo.getColumnName().toLowerCase()).append(" 表").append(columnInfo.getColumnName()).append("主键值\n");
-                mapper.append("     * @return 返回大于0的数字表示数据库删除成功，否则表示删除失败\n");
-                mapper.append("     */\n");
-                mapper.append("    int ").append(delteId).append("(").append(columnInfo.getDataType()).append(" ").append(columnInfo.getColumnName().toLowerCase()).append(");\n");
-
-                mapper.append("    /**\n");
-                mapper.append("     * 根据给定的主键值更新数据库表").append(tableName).append("的一条信息。\n");
-                mapper.append("     * @param ").append(clsName.toLowerCase()).append(" 包含主键值的").append(tableName).append("数据信息\n");
-                mapper.append("     * @return 返回大于0的数字表示数据库更新成功，否则表示更新失败\n");
-                mapper.append("     */\n");
-                mapper.append("    int ").append(updateId).append("(").append(clsName).append(" ").append(clsName.toLowerCase()).append(");\n");
             } else {
                 proBuilder.append("         #{").append(clsPro).append("},\n");
 
@@ -269,22 +245,36 @@ public class GenerateService implements IGenerateService {
                 //update语句
                 update.append("          ").append(columnName).
                         append("=#{").append(clsPro).append("},\n");
+
             }
         }
+
         insert.setCharAt(insert.lastIndexOf(","), ' ');
         proBuilder.setCharAt(proBuilder.lastIndexOf(","), ' ');
         selectSql.setCharAt(selectSql.lastIndexOf(","), ' ');
 
-        selectSql.append("          FROM ").append(tableName).append("\n");
-        selectAll.append(selectSql).append("\n").append("       </select>\n");
-        if (!pri) { //么有主键
-            selectOne = new StringBuilder("");
-            update = new StringBuilder("");
-            delete = new StringBuilder("");
-        } else {
+        selectSql.append("          FROM ").append(tableName);
+        selectAll.append(selectSql).append("\n")
+                .append("          <if test=\"start !=null\">\n             LIMIT #{start},#{end}\n          </if>\n")
+                .append("       </select>\n");
+        if (priColumn != null) {
+            mapper.append(MapperUtil.generateDeleteRecordMethod(tableName, delteId, priColumn));
+            mapper.append(MapperUtil.generateUpdateRecordMethod(tableName, domainName, updateId));
+            mapper.append(MapperUtil.generateSelectOneRecordMethod(tableName, domainName, selectOneId, priColumn));
             selectOne.append(selectSql).append(wherePRI).append("       </select>\n");
             update.setCharAt(update.lastIndexOf(","), ' ');
             update.append(wherePRI).append("\n      </update>\n");
+             //查询统计语句
+            selectCount.append("         SELECT COUNT(")
+                    .append(priColumn.getColumnName().toUpperCase()).append(")\n         FROM ")
+                    .append(tableName).append("\n");
+        } else {
+            selectOne = new StringBuilder("");
+            update = new StringBuilder("");
+            delete = new StringBuilder("");
+            //查询统计语句
+            selectCount.append("         SELECT COUNT(*) \n            FROM ")
+                    .append(tableName).append("\n");
         }
 
         insert.append("         ) VALUES (\n");
@@ -292,6 +282,7 @@ public class GenerateService implements IGenerateService {
         insert.append("         )\n");
         insert.append("     </insert>\n");
 
+        selectCount.append("       </select>\n");
 
         mapper.append("}");
 
@@ -300,9 +291,11 @@ public class GenerateService implements IGenerateService {
         sql.setSelectAllSql(selectAll.toString());
         sql.setSelectSql(selectOne.toString());
         sql.setUpdateSql(update.toString());
+        sql.setCountQuerySql(selectCount.toString());
         sql.setMapper(mapper.toString());
         return sql;
     }
+
     /**
      * 头文件
      */
@@ -319,7 +312,16 @@ public class GenerateService implements IGenerateService {
         private String deleteSql;
         private String selectAllSql;
         private String selectSql;
+        private String countQuerySql;
         private String mapper;
+
+        public String getCountQuerySql() {
+            return countQuerySql;
+        }
+
+        public void setCountQuerySql(String countQuerySql) {
+            this.countQuerySql = countQuerySql;
+        }
 
         public String getMapper() {
             return mapper;
