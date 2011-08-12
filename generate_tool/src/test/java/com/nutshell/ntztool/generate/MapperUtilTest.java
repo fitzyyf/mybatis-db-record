@@ -4,7 +4,7 @@
  */
 package com.nutshell.ntztool.generate;
 
-import com.nutshell.ntztool.generate.mybatis.MapperUtil;
+import com.nutshell.ntztool.mybatis.MapperUtil;
 import org.junit.Test;
 
 /**
