@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 NutShell.
  * [Id:MapperUtil.java  11-6-11 下午7:36 poplar.mumu ]
  */
-package com.nutshell.ntztool.generate.mybatis;
+package com.nutshell.ntztool.mybatis;
 
 import com.nutshell.ntztool.model.ColumnInfo;
 import com.nutshell.ntztool.util.DatetimeUtil;
@@ -14,7 +14,7 @@ import com.nutshell.ntztool.util.ResourceUtils;
  *
  * @author poplar_mumu
  * @version 1.0 11-6-11 下午7:36
- * @since JDK 1.0
+ * @since JDK 1.5
  */
 public class MapperUtil {
 
@@ -29,17 +29,27 @@ public class MapperUtil {
      * @return mapper接口的Java代码。
      */
     public static String generateFacesMapper(String tableComment, String domainName) {
-        StringBuilder mapper = new StringBuilder();
-        mapper.append("/**\n");
-        mapper.append(" * ").append(tableComment).append(" Mybatis Mapper接口类\n");
-        mapper.append(" * <br/>\n");
-        mapper.append(" * \n");
-        mapper.append(" * @author ").append(ResourceUtils.getProject().getUser()).append("\n");
-        mapper.append(" * @version 1.0 ").append(DatetimeUtil.dateTime()).append("\n");
-        mapper.append(" * @since JDK 1.0\n");
-        mapper.append(" */\n");
-        mapper.append("public interface ").append(domainName).append("Mapper {\n");
-        return mapper.toString();
+
+        String[] facesName = new String[]{
+                "/**\n"," * ",tableComment," Mybatis Mapper接口类\n"," * <br/>\n",
+                " * \n"," * @author ",ResourceUtils.getProject().getUser(),"\n",
+                " * @version 1.0 ",DatetimeUtil.dateTime(),"\n",
+                " * @since JDK 1.5\n"," */\n","public interface ",domainName,"Mapper {\n"
+        };
+
+        return generateAppendString(facesName);
+
+//        StringBuilder mapper = new StringBuilder();
+//        mapper.append("/**\n");
+//        mapper.append(" * ").append(tableComment).append(" Mybatis Mapper接口类\n");
+//        mapper.append(" * <br/>\n");
+//        mapper.append(" * \n");
+//        mapper.append(" * @author ").append(ResourceUtils.getProject().getUser()).append("\n");
+//        mapper.append(" * @version 1.0 ").append(DatetimeUtil.dateTime()).append("\n");
+//        mapper.append(" * @since JDK 1.0\n");
+//        mapper.append(" */\n");
+//        mapper.append("public interface ").append(domainName).append("Mapper {\n");
+//        return mapper.toString();
     }
 
     /**
@@ -168,6 +178,19 @@ public class MapperUtil {
         mapper.append("     */\n\n");
         mapper.append("    int ").append(updateMethod).append("(").append(domainName).append(" ").append(domainName.toLowerCase()).append(");\n");
         return mapper.toString();
+    }
 
+    /**
+     * 生成字符串，给定的字符串数组。
+     *
+     * @param strs 字符串数组
+     * @return 链接各个字符串，生成一个新的字符串
+     */
+    private static String generateAppendString(String[] strs) {
+        StringBuilder mapper = new StringBuilder();
+        for (String str : strs) {
+            mapper.append(str);
+        }
+        return mapper.toString();
     }
 }

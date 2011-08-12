@@ -5,7 +5,7 @@
 package com.nutshell.ntztool.generate;
 
 import com.nutshell.ntztool.db.DbInfoDao;
-import com.nutshell.ntztool.generate.mybatis.MapperUtil;
+import com.nutshell.ntztool.mybatis.MapperUtil;
 import com.nutshell.ntztool.model.ColumnInfo;
 import com.nutshell.ntztool.model.TableInfo;
 import com.nutshell.ntztool.util.DatetimeUtil;

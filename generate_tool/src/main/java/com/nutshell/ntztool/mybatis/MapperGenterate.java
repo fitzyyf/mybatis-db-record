@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 NutShell.
  * [Id:MapperXmlUtil.java  11-6-11 下午7:49 poplar.mumu ]
  */
-package com.nutshell.ntztool.generate.mybatis;
+package com.nutshell.ntztool.mybatis;
 
 import com.nutshell.ntztool.model.ColumnInfo;
 import com.nutshell.ntztool.model.TableInfo;
@@ -18,7 +18,7 @@ import java.util.List;
  * @version 1.0 11-6-11 下午7:49
  * @since JDK 1.0
  */
-public class MapperXmlUtil {
+public class MapperGenterate {
     /**
      * 主键列,可能存在多主键
      */
@@ -44,7 +44,7 @@ public class MapperXmlUtil {
      */
     private String deleteSql;
 
-    public MapperXmlUtil(TableInfo tableInfo) {
+    public MapperGenterate(TableInfo tableInfo) {
         analysis(tableInfo);
     }
 
