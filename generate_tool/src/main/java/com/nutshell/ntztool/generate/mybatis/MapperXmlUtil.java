@@ -6,7 +6,6 @@ package com.nutshell.ntztool.generate.mybatis;
 
 import com.nutshell.ntztool.model.ColumnInfo;
 import com.nutshell.ntztool.model.TableInfo;
-import com.nutshell.ntztool.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +49,6 @@ public class MapperXmlUtil {
     }
 
     private void analysis(TableInfo tableInfo) {
-        
+
     }
 }
