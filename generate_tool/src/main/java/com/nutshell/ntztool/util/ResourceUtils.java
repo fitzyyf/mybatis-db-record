@@ -14,17 +14,23 @@ import java.util.Properties;
  * @version 2011-5-3 3:48:58
  * @since JDK 1.0
  */
-public class ResourceUtils {
+public final class ResourceUtils {
     private static final JdbcInfo DEFAULT_JDBC_INFO;
 
     private static final ProjectInfo PROJECT_INFO;
+
+
+    /**
+     * 头描述文件
+     */
+    private static final String CODE_TEMPLATE;
 
     static {
         DEFAULT_JDBC_INFO = new JdbcInfo();
         Properties config = new Properties();
         PROJECT_INFO = new ProjectInfo();
         InputStream in = null;
-         String proFilePath = Constants.USER_DIR + "\\default.properties";
+        String proFilePath = Constants.USER_DIR + "/default.properties";
         try {
             in = new BufferedInputStream(new FileInputStream(proFilePath));
             config.load(in);
@@ -38,11 +44,20 @@ public class ResourceUtils {
             DEFAULT_JDBC_INFO.setPassword(password);
             PROJECT_INFO.setProjectName(config.getProperty("project.name"));
             String pkName = config.getProperty("project.package");
-            if(pkName.endsWith(".") || pkName.endsWith(",") || pkName.endsWith("。")){
+            if (pkName.endsWith(".") || pkName.endsWith(",") || pkName.endsWith("。")) {
                 throw new RuntimeException("包名不正确");
             }
             PROJECT_INFO.setPackageName(pkName);
+            PROJECT_INFO.setBizTable(config.getProperty("table.biz").toUpperCase());
             PROJECT_INFO.setUser(config.getProperty("project.user"));
+
+            CODE_TEMPLATE = "/*\n"
+                    + " * Copyright (c) 2010-2011 NutShell.\n"
+                    + " * [Project:" + config.getProperty("project.name")
+                    + ",Id:${name}.java  ${datetime} "
+                    + config.getProperty("project.user") + " ]\n"
+                    + " */\n"
+                    + "package ${package};\n";
         } catch (FileNotFoundException e) {
             throw new RuntimeException("文件不存在" + e.getLocalizedMessage());
         } catch (IOException e) {
@@ -60,11 +75,28 @@ public class ResourceUtils {
         }
     }
 
-    public static JdbcInfo getJdbc() {
+    private ResourceUtils() {
+    }
+
+    protected static class Inner {
+        private static final ResourceUtils RESOURCE_UTILS = new ResourceUtils();
+    }
+
+    public static ResourceUtils getInstance() {
+        return Inner.RESOURCE_UTILS;
+    }
+
+    public JdbcInfo getJdbc() {
         return DEFAULT_JDBC_INFO;
     }
 
-    public static ProjectInfo getProject() {
+    public ProjectInfo getProject() {
+        System.out.println(PROJECT_INFO);
         return PROJECT_INFO;
     }
+
+    public String getCodeTemplate() {
+        return CODE_TEMPLATE;
+    }
+
 }

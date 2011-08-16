@@ -4,9 +4,15 @@
  */
 package com.nutshell.ntztool.mybatis;
 
+import com.nutshell.ntztool.common.Constants;
+import com.nutshell.ntztool.generate.SqlModal;
+import com.nutshell.ntztool.generate.SqlOperator;
 import com.nutshell.ntztool.model.ColumnInfo;
+import com.nutshell.ntztool.model.TableInfo;
 import com.nutshell.ntztool.util.DatetimeUtil;
+import com.nutshell.ntztool.util.FileUtil;
 import com.nutshell.ntztool.util.ResourceUtils;
+import com.nutshell.ntztool.util.StringUtil;
 
 /**
  * 产生各个Mapper方法，为mybatis的接口类.
@@ -22,6 +28,93 @@ public class MapperUtil {
     }
 
     /**
+     * @param tableInfo 数据库表含义
+     * @param classPath 类 存放路径
+     * @return 是否操作成功
+     */
+    public static boolean createMybatis(TableInfo tableInfo, String classPath) {
+        String className = StringUtil.tableNameToClass(tableInfo.getTableName());//XML配置名
+        SqlModal sql = SqlOperator.createSql(tableInfo, className);
+        StringBuilder xmlContent = new StringBuilder();
+        xmlContent.append(sql.getInsertSql()).append(sql.getUpdateSql()).append(sql.getSelectAllSql()).
+                append(sql.getCountQuerySql()).append(sql.getSelectSql()).append(sql.getDeleteSql());
+        String packageName = Constants.PROJECT_INFO.getPackageName() + ".persistence";
+        String content = Constants.MYBATIS_XML.replace("${mappername}", packageName + "." + className + "Mapper")
+                .replace("${sqlconetnt}", xmlContent);
+        String xmlPath = FileUtil.createXmlFolder(classPath, packageName);
+        String filePath = xmlPath + "/" + className + "Mapper.xml";
+        if (FileUtil.createClassFile(content, filePath)) {
+            classPath = FileUtil.createJavaFolder(classPath, packageName);
+            filePath = classPath + "/" + className + "Mapper.java";
+            String dataTime = DatetimeUtil.dateTime();
+            String header = ResourceUtils.getInstance().getCodeTemplate().replace("${name}", className + "Mapper").replace("${datetime}", dataTime)
+                    .replace("${package}", packageName);
+            String importDomain = new StringBuilder().append("\nimport ").append(Constants.PROJECT_INFO.getPackageName()).append(".domain.")
+                    .append(className).append(";\n").append("import java.util.List;\nimport java.util.Map;\n").toString();
+            return FileUtil.createClassFile(header + importDomain + sql.getMapper(), filePath);
+        }
+        return false;
+    }
+
+
+     /**
+     * 根据表信息创建实体类。
+     *
+     * @param tableInfo 表格信息
+     * @param classPath 文件类存放文件夹
+     * @return 是否操作成功
+     */
+    public static boolean generateCode(TableInfo tableInfo, String classPath) {
+        String className = StringUtil.tableNameToClass(tableInfo.getTableName());//实体类名
+        StringBuilder builder = new StringBuilder();
+        StringBuilder getSet = new StringBuilder();
+        String dataTime = DatetimeUtil.dateTime();
+        System.out.println("nutshell代码工具:" + dataTime + ",正在生成表：" + tableInfo + "的实体类");
+        builder.append("/**\n");
+        builder.append(" * ").append(tableInfo.getTableComment()).append(" 实体\n");
+        builder.append(" * <br/>\n");
+        builder.append(" * \n");
+        builder.append(" * @author ").append(ResourceUtils.getInstance().getProject().getUser()).append("\n");
+        builder.append(" * @version 1.0 ").append(dataTime).append("\n");
+        builder.append(" * @since JDK 1.0\n");
+        builder.append(" */\n");
+        builder.append("public class ").append(className).append("{\n");
+        String clsPro;//类属性名称
+        String setName, getName;//get set名称;
+        for (ColumnInfo columnInfo : tableInfo.getColumnList()) {
+            clsPro = StringUtil.columnToPropertis(columnInfo.getColumnName());
+            setName = StringUtil.getSetMethod(clsPro, "set");
+            getName = columnInfo.getDataType().equals("boolean") ? StringUtil.getSetMethod(clsPro, "is") : StringUtil.getSetMethod(clsPro, "get");
+            builder.append("    /*\n");
+            builder.append("     *").append(columnInfo.getColumnComment()).append("\n");
+            builder.append("     */\n");
+            builder.append("    private ").append(columnInfo.getDataType()).append(" ").append(clsPro).append(";\n");
+            //get
+            getSet.append("    /**\n");
+            getSet.append("     * @return ").append(columnInfo.getColumnComment()).append("\n");
+            getSet.append("     */\n");
+            getSet.append("    public ").append(columnInfo.getDataType()).append(" ").append(getName).append("(){\n");
+            getSet.append("         return ").append(clsPro).append(";\n");
+            getSet.append("    }\n\n");
+            //set
+            getSet.append("    /**\n");
+            getSet.append("     * 设置 ").append(columnInfo.getColumnComment()).append("[")
+                    .append(columnInfo.getColumnName()).append("]\n");
+            getSet.append("     * @param ").append(clsPro).append(" ").append(columnInfo.getColumnComment()).append("\n");
+            getSet.append("     */\n");
+            getSet.append("    public void ").append(setName).append("(").append(columnInfo.getDataType()).append(" ").append(clsPro).append(") {\n");
+            getSet.append("        this.").append(clsPro).append("=").append(clsPro).append(";\n");
+            getSet.append("    }\n\n");
+        }
+        builder.append(getSet);
+        builder.append("}");
+        String packageName = Constants.PROJECT_INFO.getPackageName() + ".domain";
+        classPath = FileUtil.createJavaFolder(classPath, packageName);
+        String filePath = classPath + "/" + className + ".java";
+        String header = ResourceUtils.getInstance().getCodeTemplate().replace("${name}", className).replace("${datetime}", dataTime).replace("${package}", packageName);
+        return FileUtil.createClassFile(header + builder.toString(), filePath);
+    }
+    /**
      * 根据给定的表的描述以及接口名称以及时间，创建mapper接口的命名，注意，此处创建的java代码没有右大括号。<br/>
      *
      * @param tableComment 表的描述
@@ -32,7 +125,7 @@ public class MapperUtil {
 
         String[] facesName = new String[]{
                 "/**\n"," * ",tableComment," Mybatis Mapper接口类\n"," * <br/>\n",
-                " * \n"," * @author ",ResourceUtils.getProject().getUser(),"\n",
+                " * \n"," * @author ",ResourceUtils.getInstance().getProject().getUser(),"\n",
                 " * @version 1.0 ",DatetimeUtil.dateTime(),"\n",
                 " * @since JDK 1.5\n"," */\n","public interface ",domainName,"Mapper {\n"
         };

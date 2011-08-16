@@ -29,7 +29,7 @@ public class EnglishDict {
     static {
         Properties config = new Properties();
         InputStream in = null;
-        String proFilePath = Constants.USER_DIR + "\\dict.properties";
+        String proFilePath = Constants.USER_DIR + "/dict.properties";
         try {
             in = new BufferedInputStream(new FileInputStream(proFilePath));
             config.load(in);
@@ -73,11 +73,6 @@ public class EnglishDict {
             }
         }
         return name;
-    }
-
-    public static void main(String[] args) {
-
-        new EnglishDict();
     }
 
 }

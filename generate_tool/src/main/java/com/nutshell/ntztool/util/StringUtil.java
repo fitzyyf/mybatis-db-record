@@ -4,6 +4,8 @@
  */
 package com.nutshell.ntztool.util;
 
+import com.nutshell.ntztool.common.Constants;
+
 /**
  * 字符串工具.
  * <br/>
@@ -13,6 +15,9 @@ package com.nutshell.ntztool.util;
  * @since JDK 1.0
  */
 public class StringUtil {
+
+    private static final String TABLE_SPLIT = "_";
+
     /**
      * 产生各个sql的方法名
      *
@@ -31,8 +36,10 @@ public class StringUtil {
      * @return 转换为类名
      */
     public static String tableNameToClass(String tableName) {
-        if (tableName.contains("_")) {
-            return toSplitChar(tableName);
+        tableName = tableName.toUpperCase();
+        tableName = tableName.substring(Constants.PROJECT_INFO.getBizTable().length());
+        if (tableName.contains(TABLE_SPLIT)) {
+            return toSplitChar(tableName, true);
         } else {
             return toFirstCharUpper(tableName);
         }
@@ -45,8 +52,9 @@ public class StringUtil {
      * @return 字段名称为属性驼峰形式
      */
     public static String columnToPropertis(String columnName) {
-        if (columnName.contains("_")) {
-            return toSplitChar(columnName);
+        columnName = columnName.toLowerCase();
+        if (columnName.contains(TABLE_SPLIT)) {
+            return toSplitChar(columnName, false);
         } else {
             return EnglishDict.dictReplace(columnName.toLowerCase());
         }
@@ -60,8 +68,8 @@ public class StringUtil {
      * @return get set方法名称
      */
     public static String getSetMethod(String columnCls, String getSet) {
-        if (columnCls.contains("_")) {
-            String[] column = columnCls.split("_");
+        if (columnCls.contains(TABLE_SPLIT)) {
+            String[] column = columnCls.split(TABLE_SPLIT);
             StringBuilder builder = new StringBuilder();
             builder.append(getSet);
             for (String s : column) {
@@ -77,13 +85,15 @@ public class StringUtil {
      * 对数据库中的表的_进行驼峰转换。
      *
      * @param tableName 数据库表名称
+     * @param first     true 首字母大写，flase，首字母小写
      * @return 驼峰格式的表名
      */
-    private static String toSplitChar(String tableName) {
-        String[] table = tableName.split("_");
+    private static String toSplitChar(String tableName, boolean first) {
+        String[] table = tableName.split(TABLE_SPLIT);
         StringBuilder builder = new StringBuilder();
-        for (String s : table) {
-            builder.append(toFirstCharUpper(s));
+        for (int i = 0; i < table.length; i++) {
+            String s = table[i];
+            builder.append(first ? toFirstCharUpper(s) : (i == 0 ? s : toFirstCharUpper(s)));
         }
         return builder.toString();
     }
@@ -95,11 +105,8 @@ public class StringUtil {
      * @return 首字符大写后的字符串
      */
     private static String toFirstCharUpper(String str) {
+        str = str.toLowerCase();
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-
-    public static void main(String[] args) {
-        System.out.println(tableNameToClass("m_das_d"));
-    }
 }

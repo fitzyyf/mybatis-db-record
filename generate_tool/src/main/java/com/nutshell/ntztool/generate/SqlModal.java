@@ -1,47 +1,41 @@
 /*
  * Copyright (c) 2010-2011 NutShell.
- * [Id:SqlModel.java  11-8-12 下午6:00 poplar.mumu ]
+ * [Id:SqlModal.java  11-8-16 上午10:56 poplar.mumu ]
  */
-package com.nutshell.ntztool.sql;
-
-import java.io.Serializable;
+package com.nutshell.ntztool.generate;
 
 /**
- * SQL基本实体.
+ * .
  * <br/>
  *
  * @author poplar_mumu
- * @version 1.0 11-8-12 下午6:00
+ * @version 1.0 11-8-16 上午10:56
  * @since JDK 1.0
  */
-public class SqlModel implements Serializable {
-    private static final long serialVersionUID = -7646394029487278442L;
-
-    /**
-     * Insert INTO 语句
-     */
+public class SqlModal {
     private String insertSql;
-    /**
-     * UPDATE SET 语句
-     */
     private String updateSql;
-    /**
-     * DELETE 语句
-     */
     private String deleteSql;
-    /**
-     * 查询所有的SQL语句
-     */
     private String selectAllSql;
-    /**
-     * 查询语句
-     */
     private String selectSql;
-    /**
-     * 数据总数的SQL语句
-     */
     private String countQuerySql;
+    private String mapper;
 
+    public String getCountQuerySql() {
+        return countQuerySql;
+    }
+
+    public void setCountQuerySql(String countQuerySql) {
+        this.countQuerySql = countQuerySql;
+    }
+
+    public String getMapper() {
+        return mapper;
+    }
+
+    public void setMapper(String mapper) {
+        this.mapper = mapper;
+    }
 
     public String getInsertSql() {
         return insertSql;
@@ -81,13 +75,5 @@ public class SqlModel implements Serializable {
 
     public void setSelectSql(String selectSql) {
         this.selectSql = selectSql;
-    }
-
-    public String getCountQuerySql() {
-        return countQuerySql;
-    }
-
-    public void setCountQuerySql(String countQuerySql) {
-        this.countQuerySql = countQuerySql;
     }
 }

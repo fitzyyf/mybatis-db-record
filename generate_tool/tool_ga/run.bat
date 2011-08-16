@@ -1,4 +1,4 @@
 @echo off
-set /p netpath=ÇëÊäÈë´úÂëÎÄ¼ş´æ·ÅµØÖ·£º
+set /p netpath=ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Åµï¿½Ö·ï¿½ï¿½
 java -jar nut_genterate.jar %netpath%
 pause

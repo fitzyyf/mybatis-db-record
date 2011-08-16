@@ -30,7 +30,7 @@ public class DbInfoDao implements Serializable {
     /**
      * 数据库连接池
      */
-    private static ConnectionPool _dbPool = new ConnectionPool(ResourceUtils.getJdbc());
+    private static ConnectionPool _dbPool = new ConnectionPool(ResourceUtils.getInstance().getJdbc());
 
     /**
      * 私有
@@ -64,7 +64,8 @@ public class DbInfoDao implements Serializable {
      */
     public List<TableInfo> showTables() {
         Connection connection = _dbPool.getConnection();
-        String mysql_table_sql = "SELECT TABLE_NAME,TABLE_COMMENT,CREATE_TIME,TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ?";
+        String mysql_table_sql = "SELECT TABLE_NAME,TABLE_COMMENT,CREATE_TIME,TABLE_ROWS" +
+                " FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ?";
         ResultSet rst = null;
         PreparedStatement preparedStatement = null;
         try {
