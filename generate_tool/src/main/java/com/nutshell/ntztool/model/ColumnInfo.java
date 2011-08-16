@@ -22,6 +22,30 @@ public class ColumnInfo {
     private String columnType;
     private String columnKey;
     private String columnComment;
+    /**
+     * 是否为主键
+     */
+    private boolean pri;
+    /**
+     * 是否外健
+     */
+    private boolean fok;
+
+    public boolean isFok() {
+        return fok;
+    }
+
+    public void setFok(boolean fok) {
+        this.fok = fok;
+    }
+
+    public boolean isPri() {
+        return pri;
+    }
+
+    public void setPri(boolean pri) {
+        this.pri = pri;
+    }
 
     @Override
     public String toString() {

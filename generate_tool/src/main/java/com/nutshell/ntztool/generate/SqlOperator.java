@@ -4,7 +4,6 @@
  */
 package com.nutshell.ntztool.generate;
 
-import com.nutshell.ntztool.common.Constants;
 import com.nutshell.ntztool.model.ColumnInfo;
 import com.nutshell.ntztool.model.TableInfo;
 import com.nutshell.ntztool.mybatis.MapperUtil;
@@ -75,8 +74,8 @@ public class SqlOperator {
         StringBuilder selectSql = new StringBuilder();
         selectSql.append("          SELECT\n");
         StringBuilder wherePRI = new StringBuilder();
-        ColumnInfo priColumn = null;//主键列
-        SqlOperator.createSql(tableInfo, insert, proBuilder, selectSql, update, delete, selectOne, wherePRI, priColumn);
+        ColumnInfo priColumn =
+                SqlOperator.createSql(tableInfo, insert, proBuilder, selectSql, update, delete, selectOne, wherePRI);
         insert.setCharAt(insert.lastIndexOf(","), ' ');
         proBuilder.setCharAt(proBuilder.lastIndexOf(","), ' ');
         selectSql.setCharAt(selectSql.lastIndexOf(","), ' ');
@@ -135,18 +134,18 @@ public class SqlOperator {
      * @param delete     delete语句
      * @param selectOne  查询一条信息
      * @param wherePRI   WHERE信息
-     * @param priColumn  主键
+     * @return 返回主键对象
      */
-    private static void createSql(TableInfo tableInfo, StringBuilder insert, StringBuilder proBuilder,
-                                 StringBuilder selectSql, StringBuilder update, StringBuilder delete,
-                                 StringBuilder selectOne, StringBuilder wherePRI,
-                                 ColumnInfo priColumn) {
+    private static ColumnInfo createSql(TableInfo tableInfo, StringBuilder insert, StringBuilder proBuilder,
+                                        StringBuilder selectSql, StringBuilder update, StringBuilder delete,
+                                        StringBuilder selectOne, StringBuilder wherePRI) {
         String clsPro;//类属性名称
         String columnName;
+        ColumnInfo priColumn = null;
         for (ColumnInfo columnInfo : tableInfo.getColumnList()) {
             clsPro = StringUtil.columnToPropertis(columnInfo.getColumnName());
             columnName = columnInfo.getColumnName().toUpperCase();
-            if (Constants.PRIMARY_KEY.equals(columnInfo.getColumnKey())) {//主键
+            if (columnInfo.isPri()) {//主键
                 priColumn = columnInfo;//当前为主键
                 priColumn.setColumnName(columnName);
                 //查询语句
@@ -170,5 +169,6 @@ public class SqlOperator {
 
             }
         }
+        return priColumn;
     }
 }

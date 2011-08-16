@@ -34,7 +34,7 @@ public class MapperUtil {
      */
     public static boolean createMybatis(TableInfo tableInfo, String classPath) {
         String className = StringUtil.tableNameToClass(tableInfo.getTableName());//XML配置名
-        SqlModal sql = SqlOperator.createSql(tableInfo, className);
+        final SqlModal sql = SqlOperator.createSql(tableInfo, className);
         StringBuilder xmlContent = new StringBuilder();
         xmlContent.append(sql.getInsertSql()).append(sql.getUpdateSql()).append(sql.getSelectAllSql()).
                 append(sql.getCountQuerySql()).append(sql.getSelectSql()).append(sql.getDeleteSql());
@@ -57,7 +57,7 @@ public class MapperUtil {
     }
 
 
-     /**
+    /**
      * 根据表信息创建实体类。
      *
      * @param tableInfo 表格信息
@@ -114,6 +114,7 @@ public class MapperUtil {
         String header = ResourceUtils.getInstance().getCodeTemplate().replace("${name}", className).replace("${datetime}", dataTime).replace("${package}", packageName);
         return FileUtil.createClassFile(header + builder.toString(), filePath);
     }
+
     /**
      * 根据给定的表的描述以及接口名称以及时间，创建mapper接口的命名，注意，此处创建的java代码没有右大括号。<br/>
      *
@@ -124,10 +125,10 @@ public class MapperUtil {
     public static String generateFacesMapper(String tableComment, String domainName) {
 
         String[] facesName = new String[]{
-                "/**\n"," * ",tableComment," Mybatis Mapper接口类\n"," * <br/>\n",
-                " * \n"," * @author ",ResourceUtils.getInstance().getProject().getUser(),"\n",
-                " * @version 1.0 ",DatetimeUtil.dateTime(),"\n",
-                " * @since JDK 1.5\n"," */\n","public interface ",domainName,"Mapper {\n"
+                "/**\n", " * ", tableComment, " Mybatis Mapper接口类\n", " * <br/>\n",
+                " * \n", " * @author ", ResourceUtils.getInstance().getProject().getUser(), "\n",
+                " * @version 1.0 ", DatetimeUtil.dateTime(), "\n",
+                " * @since JDK 1.5\n", " */\n", "public interface ", domainName, "Mapper {\n"
         };
 
         return generateAppendString(facesName);

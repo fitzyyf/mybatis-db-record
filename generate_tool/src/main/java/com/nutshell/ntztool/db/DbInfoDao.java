@@ -177,7 +177,10 @@ public class DbInfoDao implements Serializable {
             info.setDataType(rst.getString(4));
             dataType = rst.getString(4);
             info.setDataType(Constants.DATA_TYPE_MAP.get(dataType.toLowerCase()));
-            info.setColumnKey(rst.getString(6));
+            String columnKey = rst.getString(6);
+            info.setColumnKey(columnKey);
+            info.setFok(Constants.MUI_KEY.equals(columnKey));
+            info.setPri(Constants.PRIMARY_KEY.equals(columnKey));
             info.setColumnComment(rst.getString(7));
             tableList.add(info);
         }

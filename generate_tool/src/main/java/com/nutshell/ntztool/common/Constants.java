@@ -54,9 +54,13 @@ public class Constants {
     public static final String USER_DIR = System.getProperty("user.dir");
 
     /**
-     * 主键唯一标志
+     * Mysql主键标志
      */
     public static final String PRIMARY_KEY = "PRI";
+    /**
+     * Mysql外健标志
+     */
+    public static final String MUI_KEY = "MUL";
 
     /**
      * MYBATIS的配置文件
