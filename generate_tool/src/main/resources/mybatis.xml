@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="#{namespace}">
+
+   <cache type="#{cache}"/>
+
+    <insert id="#{insertId}" parameterType="#{parameterType}">
+      #{insertMapper}
+     </insert>
+     <update id="updatePowerDepartment"  parameterType="PowerDepartment">
+         UPDATE PF_POWER_DEPARTMENT SET
+          DEP_NAME=#{depName},
+          DEP_SIGN=#{depSign},
+          DEP_DESC=#{depDesc},
+          CREATE_TIME=#{createTime},
+          CREATE_ACTOR=#{createActor},
+          UPDATE_TIME=#{updateTime},
+          UPDATE_ACTOR=#{updateActor},
+          SORT=#{sort}
+         WHERE ID=#{id}
+
+      </update>
+      <select id="selectOwnPowerDepartment" resultType="PowerDepartment" parameterType="map">
+          SELECT
+          ID,
+          DEP_NAME,
+          DEP_SIGN,
+          DEP_DESC,
+          CREATE_TIME,
+          CREATE_ACTOR,
+          UPDATE_TIME,
+          UPDATE_ACTOR,
+          SORT
+          FROM PF_POWER_DEPARTMENT
+          <if test="start !=null">
+             LIMIT #{start},#{end}
+          </if>
+       </select>
+      <select id="countPowerDepartment" resultType="long">
+         SELECT COUNT(ID)
+         FROM PF_POWER_DEPARTMENT
+       </select>
+      <select id="selectOnePowerDepartment"  parameterType="long">
+          SELECT
+          ID,
+          DEP_NAME,
+          DEP_SIGN,
+          DEP_DESC,
+          CREATE_TIME,
+          CREATE_ACTOR,
+          UPDATE_TIME,
+          UPDATE_ACTOR,
+          SORT
+          FROM PF_POWER_DEPARTMENT         WHERE ID=#{id}
+       </select>
+    <delete id="deletePowerDepartment" parameterType="long">
+         DELETE FROM PF_POWER_DEPARTMENT WHERE ID = #{id}
+    </delete>
+</mapper>

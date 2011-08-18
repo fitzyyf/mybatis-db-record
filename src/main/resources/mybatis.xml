@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="#{namespace}">
+
+   <cache type="#{cache}"/>
+
+    <insert id="#{insertId}" parameterType="#{parameterType}">
+      #{insertMapper}
+     </insert>
+     <update id="updatePowerDepartment"  parameterType="PowerDepartment">
+         
+      </update>
+      <select id="selectOwnPowerDepartment" resultType="PowerDepartment" parameterType="map">
+
+          <if test="start !=null">
+          </if>
+       </select>
+      <select id="countPowerDepartment" resultType="long">
+
+       </select>
+      <select id="selectOnePowerDepartment"  parameterType="long">
+
+       </select>
+    <delete id="deletePowerDepartment" parameterType="long">
+         
+    </delete>
+</mapper>
