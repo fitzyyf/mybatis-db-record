@@ -48,6 +48,8 @@ public final class ResourceUtils {
             if (pkName.endsWith(".") || pkName.endsWith(",") || pkName.endsWith("。")) {
                 throw new RuntimeException("包名不正确");
             }
+            String cache = config.getProperty("mybatis.cache");
+            PROJECT_INFO.setCache(cache == null ?"":"type=\""+cache+"\"");
             PROJECT_INFO.setPackageName(pkName);
             PROJECT_INFO.setBizTable(config.getProperty("table.biz").toUpperCase());
             PROJECT_INFO.setUser(config.getProperty("project.user"));

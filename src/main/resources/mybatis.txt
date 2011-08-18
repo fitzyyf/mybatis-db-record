@@ -3,27 +3,27 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="${namespace}">
 
-    <cache type="${cache}"/>
+    <cache ${cache}/>
 
     <insert id="insert${domainName}" parameterType="${domainName}">
-      ${insertSQL}
+        ${insertSQL}
      </insert>
     <update id="update${domainName}" parameterType="${domainName}">
-         ${updateSQL}
+        ${updateSQL}
       </update>
     <select id="selectOwn${domainName}" resultType="${domainName}" parameterType="map">
         ${queryAllSQL}
-        <if test="start !=null">
+       <if test="start !=null">
             ${pageWHERESQL}
-        </if>
+       </if>
     </select>
     <select id="count${domainName}" resultType="long">
-      ${countSQL}
+        ${countSQL}
     </select>
     <select id="selectOne${domainName}" parameterType="long">
-      ${queryOneSQL}
+        ${queryOneSQL}
     </select>
     <delete id="delete${domainName}" parameterType="long">
-      ${deleteSQL}
+        ${deleteSQL}
     </delete>
 </mapper>

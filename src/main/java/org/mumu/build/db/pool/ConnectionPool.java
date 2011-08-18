@@ -2,8 +2,9 @@
  * Copyright (c) 2010-2011 NutShell.
  * [Id:ConnectionPool.java  11-6-7 下午11:45 poplar.mumu ]
  */
-package org.mumu.build.db;
+package org.mumu.build.db.pool;
 
+import org.mumu.build.db.DBMS;
 import org.mumu.build.model.JdbcInfo;
 
 import java.sql.*;
@@ -29,6 +30,8 @@ public class ConnectionPool {
 
     private final String scheme;//当前连接的数据库
 
+    private  final DBMS dbms;//数据库链接类型
+
     private static final int initialConnections = 10; // 连接池的初始大小
 
     private static final int incrementalConnections = 5;// 连接池自动增加的大小
@@ -36,6 +39,14 @@ public class ConnectionPool {
     private int maxConnections = 50; // 连接池最大的大小
 
     private Vector connections = null; // 存放连接池中数据库连接的向量 , 初始时为 null
+
+    /**
+     * 取得数据库类型
+     * @return 数据库类型
+     */
+    public DBMS getDbms() {
+        return dbms;
+    }
 
     // 它中存放的对象为 PooledConnection 型
     public ConnectionPool(JdbcInfo info) {
@@ -45,7 +56,9 @@ public class ConnectionPool {
         dbPassword = info.getPassword();
         dbUsername = info.getUsername();
         createPool();
+        dbms = initDbmsType(getConnection());
     }
+
 
     private static String getScheme(String connectionUrl) {
         int index = connectionUrl.indexOf("?");
@@ -54,6 +67,28 @@ public class ConnectionPool {
         }
         index = connectionUrl.lastIndexOf("/") + 1;
         return connectionUrl.substring(index);
+    }
+
+    /**
+     * 取得数据库的类型。
+     * @param conn 当前数据库链接
+     * @return 数据库类型
+     */
+    private static DBMS initDbmsType(Connection conn) {
+        DatabaseMetaData dbmeta;
+        try {
+            dbmeta = conn.getMetaData();
+            String productTerm = dbmeta.getDatabaseProductName();
+            if ("mysql".equalsIgnoreCase(productTerm)) {
+                return DBMS.MYSQL;
+            }
+            if ("oracle".equalsIgnoreCase(productTerm)) {
+                return DBMS.ORACLE;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -88,7 +123,6 @@ public class ConnectionPool {
             return;
         }
         System.out.println(" 数据库连接池创建成功！ ");
-
     }
 
     /**

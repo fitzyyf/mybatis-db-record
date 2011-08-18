@@ -1,15 +1,9 @@
-/*
- * Copyright (c) 2010-2011 NutShell.
- * [Id:DbInfoDao.java  11-6-8 上午12:09 poplar.mumu ]
- */
-package org.mumu.build.db;
+package org.mumu.build.db.impl;
 
 import org.mumu.build.common.Constants;
 import org.mumu.build.model.ColumnInfo;
 import org.mumu.build.model.TableInfo;
-import org.mumu.build.util.ResourceUtils;
 
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,52 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 数据库查询系统信息的DAO单例.
+ * .
  * <br/>
  *
  * @author poplar_mumu
- * @version 1.0 11-6-8 上午12:09
+ * @version 1.0 18/08/2011 6:21 下午
  * @since JDK 1.0
  */
-public class DbInfoDao implements Serializable {
-    private static final long serialVersionUID = -8330342089583159920L;
-    /**
-     * 数据库连接池
-     */
-    private static ConnectionPool _dbPool = new ConnectionPool(ResourceUtils.getInstance().getJdbc());
-
-    /**
-     * 私有
-     */
-    private DbInfoDao() {
-    }
-
-    private static TableInfo showTable(String tableName, final Connection connection, PreparedStatement pstm) throws SQLException {
-        String mysql_table_sql = "SELECT TABLE_NAME,TABLE_COMMENT,CREATE_TIME,TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME=? ";
-        pstm = connection.prepareStatement(mysql_table_sql);
-        pstm.setString(1, _dbPool.getScheme());
-        pstm.setString(2, tableName);
-        ResultSet rst = pstm.executeQuery();
-        TableInfo info = null;
-        while (rst.next()) {
-            info = new TableInfo();
-            info.setTableName(tableName);
-            info.setTableComment(rst.getString(2));
-            info.setCreateTime(rst.getString(3));
-            info.setRows(rst.getInt(4));
-            info.setColumnList(getColumns(connection, tableName, pstm));
-        }
-        return info;
-    }
-
-    /**
-     * 查询当前连接的库中，包含哪些表的信息。
-     *
-     * @return 数据库中的表 <br/>
-     *         如果返回<code>null</code>表示查询失败
-     */
+public class MysqlTableInfoDao extends TableInfoDao {
+    @Override
     public List<TableInfo> showTables() {
-        Connection connection = _dbPool.getConnection();
+        Connection connection = DB_POOL.getConnection();
         String mysql_table_sql = "SELECT TABLE_NAME,TABLE_COMMENT,CREATE_TIME,TABLE_ROWS" +
                 " FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ?";
         ResultSet rst = null;
@@ -71,7 +30,7 @@ public class DbInfoDao implements Serializable {
         try {
             connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement(mysql_table_sql);
-            preparedStatement.setString(1, _dbPool.getScheme());
+            preparedStatement.setString(1, DB_POOL.getScheme());
             rst = preparedStatement.executeQuery();
             List<TableInfo> tableList = new ArrayList<TableInfo>();
             TableInfo info;
@@ -98,7 +57,7 @@ public class DbInfoDao implements Serializable {
                     rst.close();
                 }
                 connection.rollback();
-                _dbPool.returnConnection(connection);
+                DB_POOL.returnConnection(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -106,28 +65,9 @@ public class DbInfoDao implements Serializable {
         return null;
     }
 
-    /**
-     * 查询给定表的所有的字段信息.
-     *
-     * @param conn      数据库连接
-     * @param tableName 数据库表名称
-     * @return 给定的表的所有字段属性 <br/>
-     *         如果范围<code>null</code>表示查询失败
-     * @throws java.sql.SQLException 数据库异常
-     */
-    private static TableInfo showColumns(final Connection conn, String tableName) throws SQLException {
-        return getTableColumns(conn, tableName);
-    }
-
-    /**
-     * 查询给定表的所有的字段信息.
-     *
-     * @param tableName 数据库表名称
-     * @return 给定的表的所有字段属性 <br/>
-     *         如果范围<code>null</code>表示查询失败
-     */
+    @Override
     public TableInfo showColumns(String tableName) {
-        Connection connection = _dbPool.getConnection();
+        Connection connection = DB_POOL.getConnection();
         try {
             connection.setAutoCommit(false);
             return getTableColumns(connection, tableName);
@@ -139,10 +79,11 @@ public class DbInfoDao implements Serializable {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            _dbPool.returnConnection(connection);
+            DB_POOL.returnConnection(connection);
         }
         return null;
     }
+
 
     /**
      * 查询给定表的所有的字段信息.
@@ -160,6 +101,42 @@ public class DbInfoDao implements Serializable {
         return tableInfo;
     }
 
+    /**
+     * 取得数据库某个表的信息。
+     * @param tableName 数据库表名
+     * @param connection 数据库链接对象
+     * @param pstm 数据库预编译对象
+     * @return 某个表的具体信息
+     * @throws SQLException 数据库异常
+     */
+    private static TableInfo showTable(String tableName, final Connection connection, PreparedStatement pstm) throws SQLException {
+        String mysql_table_sql = "SELECT TABLE_NAME,TABLE_COMMENT,CREATE_TIME,TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME=? ";
+        pstm = connection.prepareStatement(mysql_table_sql);
+        pstm.setString(1, DB_POOL.getScheme());
+        pstm.setString(2, tableName);
+        ResultSet rst = pstm.executeQuery();
+        TableInfo info = null;
+        while (rst.next()) {
+            info = new TableInfo();
+            info.setTableName(tableName);
+            info.setTableComment(rst.getString(2));
+            info.setCreateTime(rst.getString(3));
+            info.setRows(rst.getInt(4));
+            info.setColumnList(getColumns(connection, tableName, pstm));
+        }
+        return info;
+    }
+
+    /**
+     * 查询给定表的所有的字段信息.
+     *
+     * @param connection        数据库连接
+     * @param tableName         数据库表名称
+     * @param preparedStatement 数据库预编译对象
+     * @return 给定的表的所有字段属性 <br/>
+     *         如果范围<code>null</code>表示查询失败
+     * @throws java.sql.SQLException 数据库异常
+     */
     private static List<ColumnInfo> getColumns(final Connection connection, String tableName,
                                                PreparedStatement preparedStatement) throws SQLException {
         String mysql_column_sql = "SELECT TABLE_NAME,COLUMN_NAME,IS_NULLABLE,DATA_TYPE,COLUMN_TYPE,COLUMN_KEY,COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?";
@@ -185,18 +162,5 @@ public class DbInfoDao implements Serializable {
             tableList.add(info);
         }
         return tableList;
-    }
-
-    /**
-     * 单例获取数据库连接操作属性。
-     *
-     * @return 表信息数据库操作对象
-     */
-    public static DbInfoDao getInstance() {
-        return Single.DB_INFO_DAO;
-    }
-
-    private abstract interface Single {
-        static final DbInfoDao DB_INFO_DAO = new DbInfoDao();
     }
 }

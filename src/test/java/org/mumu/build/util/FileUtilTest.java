@@ -48,4 +48,11 @@ public class FileUtilTest {
         String path =FileUtil.getClassPath("default.properties");
         System.out.println(path);
     }
+
+    @Test
+    public void testDeleteLashChar() throws Exception {
+        StringBuilder str =new StringBuilder( "asdasdfasdfasdfas AND \n");
+
+        System.out.println(StringUtil.deleteLastChar(str,"AND"));
+    }
 }

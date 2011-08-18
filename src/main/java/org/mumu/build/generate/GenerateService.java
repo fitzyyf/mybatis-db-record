@@ -4,9 +4,8 @@
  */
 package org.mumu.build.generate;
 
-import org.mumu.build.db.DbInfoDao;
+import org.mumu.build.db.TableInfoClient;
 import org.mumu.build.model.TableInfo;
-import org.mumu.build.mybatis.MapperUtil;
 
 import java.util.List;
 
@@ -23,12 +22,12 @@ public class GenerateService implements IGenerateService {
 
     @Override
     public boolean generateFile(String path) {
-        List<TableInfo> tableInfoList = DbInfoDao.getInstance().showTables();
+        List<TableInfo> tableInfoList = TableInfoClient.instance.showTables();
         for (TableInfo tableInfo : tableInfoList) {
-            if (!MapperUtil.generateCode(tableInfo, path)) {
+            if (!BuilderEntity.generateCode(tableInfo, path)) {
                 throw new RuntimeException("创建实体类出错");
             }
-            if (!MapperUtil.createMybatis(tableInfo, path)) {
+            if (!BuildMapper.createMybatis(tableInfo, path)) {
                 throw new RuntimeException("创建Mybatis配置文件出错");
             }
         }
@@ -37,9 +36,9 @@ public class GenerateService implements IGenerateService {
 
     @Override
     public boolean generateEntityCode(String codeFilePath) {
-        List<TableInfo> tableInfoList = DbInfoDao.getInstance().showTables();
+        List<TableInfo> tableInfoList = TableInfoClient.instance.showTables();
         for (TableInfo tableInfo : tableInfoList) {
-            if (!MapperUtil.generateCode(tableInfo, codeFilePath)) {
+            if (!BuilderEntity.generateCode(tableInfo, codeFilePath)) {
                 throw new RuntimeException("创建实体类出错");
             }
         }
@@ -48,15 +47,15 @@ public class GenerateService implements IGenerateService {
 
     @Override
     public boolean generateEntityCode(String tableName, String codeFilePath) {
-        TableInfo tableInfo = DbInfoDao.getInstance().showColumns(tableName);
-        return MapperUtil.generateCode(tableInfo, codeFilePath);
+        TableInfo tableInfo = TableInfoClient.instance.showColumns(tableName);
+        return BuilderEntity.generateCode(tableInfo, codeFilePath);
     }
 
     @Override
     public boolean generateMybatisXml(String xmlFilePath) {
-        List<TableInfo> tableInfoList = DbInfoDao.getInstance().showTables();
+        List<TableInfo> tableInfoList = TableInfoClient.instance.showTables();
         for (TableInfo tableInfo : tableInfoList) {
-            if (!MapperUtil.createMybatis(tableInfo, xmlFilePath)) {
+            if (!BuildMapper.createMybatis(tableInfo, xmlFilePath)) {
                 throw new RuntimeException("创建Mybatis配置文件出错");
             }
         }

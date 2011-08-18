@@ -49,6 +49,24 @@ public class Constants {
     }
 
     /**
+     * 空白符号
+     */
+    public static final String BLANK_SIGN = "        ";
+    /**
+     * 双号空白符号
+     */
+    public static final String TWOBLANK_SIGN = "          ";
+    /**
+     * 换行符号
+     */
+    public static final String WRAP_CHAR = "\n";
+
+    /**
+     * SQL的AND标记
+     */
+    public static final String AND_SIGN = "AND";
+
+    /**
      * 当前工作目录
      */
     public static final String USER_DIR = System.getProperty("user.dir");
@@ -61,6 +79,20 @@ public class Constants {
      * Mysql外健标志
      */
     public static final String MUI_KEY = "MUL";
+    /**
+     * sql Select
+     */
+    public static final String SELECT_KEY = "SELECT ";
+    /**
+     * FROM sql key
+     */
+    public static final String FROM_KEY = "FROM ";
+
+
+    public static final String DELETE_KEY = "DELETE FROM ";
+
+
+    public static final String WHERE_KEY = "WHERE ";
 
 
     /**

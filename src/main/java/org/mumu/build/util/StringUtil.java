@@ -37,14 +37,14 @@ public class StringUtil {
     }
 
     /**
-     * 产生各个sql的方法名
-     *
-     * @param dmlName   操作名称
-     * @param tableName 数据表名称
-     * @return sql名称
+     * 删除字符串中最后一个出现的指定的字符串
+     * @param stringBuilder 需要删除的原始字符串
+     * @param character 指定要删除的字符串
+     * @return 删除后的字符串
      */
-    public static String sqlName(String dmlName, String tableName) {
-        return dmlName + tableName;
+    public static String deleteLastChar(StringBuilder stringBuilder,String character){
+        int last = stringBuilder.lastIndexOf(character);
+        return stringBuilder.substring(0, last);
     }
 
     /**
@@ -70,7 +70,6 @@ public class StringUtil {
      */
     public static String toHump(String properties){
         properties = properties.toLowerCase();
-
         return properties.contains(TABLE_SPLIT)?
                 toSplitChar(properties,false) :
                 EnglishDict.dictReplace(properties);

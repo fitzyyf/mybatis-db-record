@@ -43,7 +43,7 @@ public class TemplateSM implements Serializable {
      * @return XML模板信息
      */
     private static String readXmlTemp() {
-        String path = FileUtil.getClassPath("mybatis.xml");
+        String path = FileUtil.getClassPath("mybatis.txt");
         return FileUtil.readFileContent(path);
     }
 

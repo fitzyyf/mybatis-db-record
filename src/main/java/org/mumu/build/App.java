@@ -5,7 +5,7 @@ import org.mumu.build.generate.IGenerateService;
 import org.mumu.build.util.ResourceUtils;
 
 /**
- * Hello world!
+ * 系统入口
  */
 public class App {
     public static void main(String[] args) {

@@ -62,7 +62,7 @@ public class FileUtil {
      * @return 路径
      */
     public static String createXmlFolder(String folderPath, String packageName) {
-        folderPath = generatPackageFileFloder(folderPath + "/xml/", packageName);
+        folderPath = generatPackageFileFloder(folderPath + "/resources/", packageName);
         File file = new File(folderPath);
         if (!file.exists()) {
             file.mkdirs();
