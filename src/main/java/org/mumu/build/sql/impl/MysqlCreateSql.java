@@ -18,12 +18,15 @@ public class MysqlCreateSql extends CreateSql implements ICreateSqlFace {
     private MysqlCreateSql() {
     }
 
+    /**
+     * 
+     */
     private static class Inner {
-        private static final ICreateSqlFace CREATE_SQL_FACE = new MysqlCreateSql();
+        private static  ICreateSqlFace _mysql = new MysqlCreateSql();
     }
 
     public static ICreateSqlFace getInstance() {
-        return Inner.CREATE_SQL_FACE;
+        return Inner._mysql;
     }
 
     @Override

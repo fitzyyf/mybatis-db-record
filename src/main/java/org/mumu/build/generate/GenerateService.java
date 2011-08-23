@@ -34,6 +34,11 @@ public class GenerateService implements IGenerateService {
         return true;
     }
 
+    /**
+     *
+     * @param codeFilePath 代码文件存放文件夹地址
+     * @return
+     */
     @Override
     public boolean generateEntityCode(String codeFilePath) {
         List<TableInfo> tableInfoList = TableInfoClient.instance.showTables();

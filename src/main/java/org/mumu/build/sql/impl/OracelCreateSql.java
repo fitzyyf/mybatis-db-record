@@ -18,11 +18,11 @@ public class OracelCreateSql extends CreateSql implements ICreateSqlFace {
     }
 
     private static class Inner {
-        private static final ICreateSqlFace CREATE_SQL_FACE = new OracelCreateSql();
+        private static  ICreateSqlFace _oracle = new OracelCreateSql();
     }
 
     public static ICreateSqlFace getInstance() {
-        return Inner.CREATE_SQL_FACE;
+        return Inner._oracle;
     }
 
     @Override
