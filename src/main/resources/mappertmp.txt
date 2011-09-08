@@ -22,7 +22,7 @@ public interface ${className} {
      * @param ${domainParam} ${tableName}数据信息
      * @return 返回大于0的数字表示数据库新增成功，否则表示新增失败
      */
-    int insert${domainName}(${domainName}, ${domainParam});
+    int insert${domainName}(${domainName} ${domainParam});
 
     /**
      * 取得表${tableName}记录总数。
@@ -50,7 +50,7 @@ public interface ${className} {
      * @param ${domainParam} 包含主键值的${tableName}数据信息
      * @return 返回大于0的数字表示数据库更新成功，否则表示更新失败
      */
-    int update${domainName}(${domainName}, ${domainParam});
+    int update${domainName}(${domainName} ${domainParam});
 
     /**
      * 根据给定的主键值取得表${tableName}对应的记录。
