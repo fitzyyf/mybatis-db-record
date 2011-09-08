@@ -33,22 +33,25 @@ public class BuilderEntity {
         StringBuilder builder = new StringBuilder();
         StringBuilder getSet = new StringBuilder();
         String dataTime = DatetimeUtil.dateTime();
-        System.out.println("nutshell代码工具:" + dataTime + ",正在生成表：" + tableInfo + "的实体类");
+        System.out.println("NOO代码工具:" + dataTime + ",正在生成表：" + tableInfo + "的实体类");
         builder.append("/**\n");
         builder.append(" * ").append(tableInfo.getTableComment()).append(" 实体\n");
         builder.append(" * <br/>\n");
         builder.append(" * \n");
         builder.append(" * @author ").append(Constants.PROJECT_INFO.getUser()).append("\n");
         builder.append(" * @version 1.0 ").append(dataTime).append("\n");
-        builder.append(" * @since JDK 1.0\n");
+        builder.append(" * @since JDK 1.5\n");
         builder.append(" */\n");
         builder.append("public class ").append(className).append("{\n");
         String clsPro;//类属性名称
         String setName, getName;//get set名称;
         for (ColumnInfo columnInfo : tableInfo.getColumnList()) {
+            System.out.println(columnInfo);
             clsPro = StringUtil.columnToPropertis(columnInfo.getColumnName());
             setName = StringUtil.getSetMethod(clsPro, "set");
-            getName = columnInfo.getDataType().equals("boolean") ? StringUtil.getSetMethod(clsPro, "is") : StringUtil.getSetMethod(clsPro, "get");
+            getName = columnInfo.getDataType().equals("boolean") ?
+                    StringUtil.getSetMethod(clsPro, "is") :
+                    StringUtil.getSetMethod(clsPro, "get");
             builder.append("    /*\n");
             builder.append("     *").append(columnInfo.getColumnComment()).append("\n");
             builder.append("     */\n");
@@ -64,9 +67,11 @@ public class BuilderEntity {
             getSet.append("    /**\n");
             getSet.append("     * 设置 ").append(columnInfo.getColumnComment()).append("[")
                     .append(columnInfo.getColumnName()).append("]\n");
-            getSet.append("     * @param ").append(clsPro).append(" ").append(columnInfo.getColumnComment()).append("\n");
+            getSet.append("     * @param ").append(clsPro).append(" ").
+                    append(columnInfo.getColumnComment()).append("\n");
             getSet.append("     */\n");
-            getSet.append("    public void ").append(setName).append("(").append(columnInfo.getDataType()).append(" ").append(clsPro).append(") {\n");
+            getSet.append("    public void ").append(setName).append("(").
+                    append(columnInfo.getDataType()).append(" ").append(clsPro).append(") {\n");
             getSet.append("        this.").append(clsPro).append("=").append(clsPro).append(";\n");
             getSet.append("    }\n\n");
         }
@@ -75,7 +80,9 @@ public class BuilderEntity {
         String packageName = Constants.PROJECT_INFO.getPackageName() + ".domain";
         classPath = FileUtil.createJavaFolder(classPath, packageName);
         String filePath = classPath + "/" + className + ".java";
-        String header = ResourceUtils.getInstance().getCodeTemplate().replace("${name}", className).replace("${datetime}", dataTime).replace("${package}", packageName);
+        String header = ResourceUtils.getInstance().getCodeTemplate()
+                .replace("${name}", className).replace("${datetime}", dataTime)
+                .replace("${package}", packageName);
         return FileUtil.createClassFile(header + builder.toString(), filePath);
     }
 }

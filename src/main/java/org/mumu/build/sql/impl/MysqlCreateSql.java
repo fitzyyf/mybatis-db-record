@@ -1,5 +1,6 @@
 package org.mumu.build.sql.impl;
 
+import org.mumu.build.common.Constants;
 import org.mumu.build.model.MybatisSqlModal;
 import org.mumu.build.model.SqlModal;
 import org.mumu.build.model.TableInfo;
@@ -19,12 +20,16 @@ public class MysqlCreateSql extends CreateSql implements ICreateSqlFace {
     }
 
     /**
-     * 
+     * 内部类，用来产生内部单例
      */
     private static class Inner {
-        private static  ICreateSqlFace _mysql = new MysqlCreateSql();
+        private static ICreateSqlFace _mysql = new MysqlCreateSql();
     }
 
+    /**
+     * 获取创建Mysql脚本的单例对象
+     * @return 创建Mysql脚本的单例对象
+     */
     public static ICreateSqlFace getInstance() {
         return Inner._mysql;
     }
@@ -36,17 +41,30 @@ public class MysqlCreateSql extends CreateSql implements ICreateSqlFace {
         MybatisSqlModal mybatisSqlModal = gengerateSql(tableInfo);
         sql.setInsertSql(generateInsertSql(mybatisSqlModal, tableName));
         sql.setDeleteSql(generateDeleteSql(mybatisSqlModal, tableName));
-        sql.setSelectAllSql(generateSelectSql(mybatisSqlModal, tableName));
+        sql.setSelectAllSql(pageSelectSql(mybatisSqlModal, tableName));
         sql.setSelectSql(generateSelectOneSql(mybatisSqlModal, tableName));
         sql.setUpdateSql(generateUpdateSql(mybatisSqlModal, tableName));
         sql.setCountQuerySql(generateCountSql(mybatisSqlModal, tableName));
-        sql.setPageWhereSql(pageSql());
+        sql.setPageWhereSql(pageParamSql());
         return sql;
     }
 
     @Override
-    protected String pageSql() {
+    protected String pageParamSql() {
         return "LIMIT #{start},#{end}";
+    }
+
+    @Override
+    protected String pageSelectSql(MybatisSqlModal mybatisSqlModal, String tableName) {
+        StringBuilder selectAllSql = new StringBuilder();
+        selectAllSql.append(Constants.SELECT_KEY)
+                .append(Constants.WRAP_CHAR)
+                .append(mybatisSqlModal.getSelectColumn())
+                .append(Constants.WRAP_CHAR)
+                .append(Constants.BLANK_SIGN)
+                .append(Constants.FROM_KEY)
+                .append(tableName);
+        return selectAllSql.toString();
     }
 
     //todo

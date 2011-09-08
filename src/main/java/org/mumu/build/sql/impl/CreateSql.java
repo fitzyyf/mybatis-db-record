@@ -17,16 +17,17 @@ import java.util.List;
  * @version 1.0 18/08/2011 1:08 下午
  * @since JDK 1.0
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public abstract class CreateSql {
     /**
      * 产生各种sql
      *
+     * @param tableInfo 数据库表信息
      * @return 返回INSERT、UPDATE
      */
     protected static MybatisSqlModal gengerateSql(TableInfo tableInfo) {
         MybatisSqlModal mybatisSqlModal = new MybatisSqlModal();
-        String clsPro;//类属性名称
-        String columnName;
+        String clsPro, columnName;//类属性名称
         StringBuilder selectColumn = new StringBuilder();
         StringBuilder insertColumns = new StringBuilder();//insert语句mybatis的标记
         StringBuilder updateColumns = new StringBuilder();//update语句mybatis的标记
@@ -125,24 +126,6 @@ public abstract class CreateSql {
         return StringUtil.deleteLastChar(updateSql, Constants.AND_SIGN);
     }
 
-    /**
-     * 产生查询语句。
-     *
-     * @param mybatisSqlModal 分析后的mybatis的sql语句
-     * @param tableName       数据库表名
-     * @return 查询脚本
-     */
-    protected static String generateSelectSql(MybatisSqlModal mybatisSqlModal, String tableName) {
-        StringBuilder selectAllSql = new StringBuilder();
-        selectAllSql.append(Constants.SELECT_KEY)
-                .append(Constants.WRAP_CHAR)
-                .append(mybatisSqlModal.getSelectColumn())
-                .append(Constants.WRAP_CHAR)
-                .append(Constants.BLANK_SIGN)
-                .append(Constants.FROM_KEY)
-                .append(tableName);
-        return selectAllSql.toString();
-    }
 
     /**
      * 查询根据主键查询单个信息的脚本
@@ -227,11 +210,12 @@ public abstract class CreateSql {
     }
 
     /**
-     * 生成分页sql信息
+     * 生成分页sql的Where后信息
      *
-     * @return 分页信息
+     * @return 分页sql的Where
+     *         <p>例如：mysql的生成：limit start and end</p>
      */
-    protected abstract String pageSql();
+    protected abstract String pageParamSql();
 
     /**
      * 产生获取刚写入数据库信息表的主键值的相关sql。
@@ -240,4 +224,14 @@ public abstract class CreateSql {
      * @return 写入获取主键相关sql
      */
     protected abstract String getInsertPrimaryKey();
+
+
+    /**
+     * 产生查询语句。与分页查询有关，所以，在这里需要每个数据库的实现都要重写改方法
+     *
+     * @param mybatisSqlModal 分析后的mybatis的sql语句
+     * @param tableName       数据库表名
+     * @return 查询脚本
+     */
+    protected abstract String pageSelectSql(MybatisSqlModal mybatisSqlModal, String tableName);
 }

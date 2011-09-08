@@ -1,11 +1,12 @@
 package org.mumu.build.sql.impl;
 
+import org.mumu.build.model.MybatisSqlModal;
 import org.mumu.build.model.SqlModal;
 import org.mumu.build.model.TableInfo;
 import org.mumu.build.sql.ICreateSqlFace;
 
 /**
- * .
+ * Oracle数据库创建脚本的抽象工厂实现.
  * <br/>
  *
  * @author poplar_mumu
@@ -26,7 +27,7 @@ public class OracelCreateSql extends CreateSql implements ICreateSqlFace {
     }
 
     @Override
-    protected String pageSql() {
+    protected String pageParamSql() {
         return null;
     }
 
@@ -37,6 +38,11 @@ public class OracelCreateSql extends CreateSql implements ICreateSqlFace {
 
     @Override
     public SqlModal createSql(TableInfo tableInfo) {
+        return null;
+    }
+
+    @Override
+    protected String pageSelectSql(MybatisSqlModal mybatisSqlModal, String tableName) {
         return null;
     }
 }

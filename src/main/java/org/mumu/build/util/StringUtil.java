@@ -21,6 +21,7 @@ public class StringUtil {
     /**
      * 替换字符串。如果原始字符串和替换的标记为null，返回“”。
      * 注意，替换标记和替换内容按数组下标保持一致
+     *
      * @param template 原始字符串
      * @param temp     需要替换的标记字符串数组
      * @param replace  替换的内容 的数组
@@ -31,18 +32,19 @@ public class StringUtil {
             return "";
         }
         for (int i = 0; i < temp.length; i++) {
-            template = template.replace(temp[i],replace[i]);
+            template = template.replace(temp[i], replace[i]);
         }
         return template;
     }
 
     /**
      * 删除字符串中最后一个出现的指定的字符串
+     *
      * @param stringBuilder 需要删除的原始字符串
-     * @param character 指定要删除的字符串
+     * @param character     指定要删除的字符串
      * @return 删除后的字符串
      */
-    public static String deleteLastChar(StringBuilder stringBuilder,String character){
+    public static String deleteLastChar(StringBuilder stringBuilder, String character) {
         int last = stringBuilder.lastIndexOf(character);
         return stringBuilder.substring(0, last);
     }
@@ -55,23 +57,25 @@ public class StringUtil {
      */
     public static String tableNameToClass(String tableName) {
         tableName = tableName.toUpperCase();
-        tableName = tableName.substring(Constants.PROJECT_INFO.getBizTable().length());
+        tableName = tableName.substring(tableName.lastIndexOf(Constants.PROJECT_INFO.getBizTable()) + 1);
         if (tableName.contains(TABLE_SPLIT)) {
             return toSplitChar(tableName, true);
         } else {
+            tableName = tableName.toLowerCase();
             return toFirstCharUpper(tableName);
         }
     }
 
     /**
      * 将属性名称以驼峰方式进行转换。
+     *
      * @param properties 属性名称
      * @return 驼峰方式
      */
-    public static String toHump(String properties){
+    public static String toHump(String properties) {
         properties = properties.toLowerCase();
-        return properties.contains(TABLE_SPLIT)?
-                toSplitChar(properties,false) :
+        return properties.contains(TABLE_SPLIT) ?
+                toSplitChar(properties, false) :
                 EnglishDict.dictReplace(properties);
     }
 
@@ -135,7 +139,6 @@ public class StringUtil {
      * @return 首字符大写后的字符串
      */
     private static String toFirstCharUpper(String str) {
-        str = str.toLowerCase();
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 

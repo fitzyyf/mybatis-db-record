@@ -27,15 +27,17 @@ public class BuildMapper {
      * @return 是否操作成功
      */
     public static boolean createMybatis(TableInfo tableInfo, String classPath) {
-        String className = StringUtil.tableNameToClass(tableInfo.getTableName());//XML实体数据库对应名称
-        ICreateSqlFace createSqlFace = BuildSqlFactory.getDBMSBuilderSql(TableInfoDao.DB_POOL.getDbms());
+        //XML实体数据库对应名称
+        String className = StringUtil.tableNameToClass(tableInfo.getTableName());
+        ICreateSqlFace createSqlFace = BuildSqlFactory.
+                getDBMSBuilderSql(TableInfoDao.DB_POOL.getDbms());
         final SqlModal sql = createSqlFace.createSql(tableInfo);
         String tmpPakcage = Constants.PROJECT_INFO.getPackageName();
         String packageName = tmpPakcage + ".persistence";
 
         String xmlPath = FileUtil.createXmlFolder(classPath, packageName);
 
-        String packageMapper = packageName + "." + className + "Mapper";
+        String packageMapper = packageName + "." + className + Constants.MAPPER;
         String content =
                 StringUtil.replace(TemplateSM.XML_TEMP, Constants.XML_TEMP,
                         converSqlArray(sql, packageMapper, className));
@@ -46,17 +48,18 @@ public class BuildMapper {
             classPath = FileUtil.createJavaFolder(classPath, packageName);
             filePath = classPath + "/" + mapperName + ".java";
             String dataTime = DatetimeUtil.dateTime();
-            content = StringUtil.replace(TemplateSM.MAPPER_TEMP, Constants.MAPPER_TEMP, new String[]{
-                    tmpPakcage + ".domain." + className,
-                    packageName,
-                    tableInfo.getTableComment(),
-                    Constants.PROJECT_INFO.getUser(),
-                    dataTime,
-                    mapperName,
-                    tableInfo.getTableName(),
-                    className,
-                    StringUtil.toHump(className)
-            });
+            content = StringUtil.replace(TemplateSM.MAPPER_TEMP, Constants.MAPPER_TEMP,
+                    new String[]{
+                            tmpPakcage + ".domain." + className,
+                            packageName,
+                            tableInfo.getTableComment(),
+                            Constants.PROJECT_INFO.getUser(),
+                            dataTime,
+                            mapperName,
+                            tableInfo.getTableName(),
+                            className,
+                            StringUtil.toHump(className)
+                    });
             return FileUtil.createClassFile(content, filePath);
         }
         return false;
@@ -69,7 +72,7 @@ public class BuildMapper {
      * @return 实体类名＋Mapper
      */
     private static String createMapperName(String className) {
-        return className + "Mapper";
+        return className + Constants.MAPPER;
     }
 
 

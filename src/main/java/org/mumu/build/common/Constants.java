@@ -23,7 +23,9 @@ public class Constants {
      * 数据库与JDBCJava类型
      */
     public static final Map<String, String> DATA_TYPE_MAP = new HashMap<String, String>();
-
+    /**
+     * 资源配置种的工程信息
+     */
     public static final ProjectInfo PROJECT_INFO;
 
     static {
@@ -93,6 +95,10 @@ public class Constants {
 
 
     public static final String WHERE_KEY = "WHERE ";
+    /**
+     * Mapper接口的文件名称的结尾标志
+     */
+    public static final String MAPPER = "Mapper";
 
 
     /**

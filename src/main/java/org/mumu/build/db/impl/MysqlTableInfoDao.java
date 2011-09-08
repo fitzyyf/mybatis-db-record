@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * .
+ * Mysql查询数据库系统表以及字段信息的生产者.
  * <br/>
  *
  * @author poplar_mumu
  * @version 1.0 18/08/2011 6:21 下午
- * @since JDK 1.0
+ * @since JDK 1.5
  */
 public class MysqlTableInfoDao extends TableInfoDao {
     @Override
@@ -42,7 +42,7 @@ public class MysqlTableInfoDao extends TableInfoDao {
                 info.setTableComment(rst.getString(2));
                 info.setCreateTime(rst.getString(3));
                 info.setRows(rst.getInt(4));
-                info.setColumnList(getColumns(connection, tableName, preparedStatement));
+                info.setColumnList(getColumns(connection, tableName,DB_POOL.getScheme(), preparedStatement));
                 tableList.add(info);
             }
             return tableList;
@@ -97,15 +97,16 @@ public class MysqlTableInfoDao extends TableInfoDao {
     private static TableInfo getTableColumns(final Connection connection, String table) throws SQLException {
         PreparedStatement preparedStatement = null;
         TableInfo tableInfo = showTable(table, connection, preparedStatement);
-        tableInfo.setColumnList(getColumns(connection, table, preparedStatement));
+        tableInfo.setColumnList(getColumns(connection, table,DB_POOL.getScheme(), preparedStatement));
         return tableInfo;
     }
 
     /**
      * 取得数据库某个表的信息。
-     * @param tableName 数据库表名
+     *
+     * @param tableName  数据库表名
      * @param connection 数据库链接对象
-     * @param pstm 数据库预编译对象
+     * @param pstm       数据库预编译对象
      * @return 某个表的具体信息
      * @throws SQLException 数据库异常
      */
@@ -122,7 +123,7 @@ public class MysqlTableInfoDao extends TableInfoDao {
             info.setTableComment(rst.getString(2));
             info.setCreateTime(rst.getString(3));
             info.setRows(rst.getInt(4));
-            info.setColumnList(getColumns(connection, tableName, pstm));
+            info.setColumnList(getColumns(connection, tableName,DB_POOL.getScheme(), pstm));
         }
         return info;
     }
@@ -132,16 +133,19 @@ public class MysqlTableInfoDao extends TableInfoDao {
      *
      * @param connection        数据库连接
      * @param tableName         数据库表名称
+     * @param schema            数据库架构
      * @param preparedStatement 数据库预编译对象
      * @return 给定的表的所有字段属性 <br/>
      *         如果范围<code>null</code>表示查询失败
      * @throws java.sql.SQLException 数据库异常
      */
-    private static List<ColumnInfo> getColumns(final Connection connection, String tableName,
+    private static List<ColumnInfo> getColumns(final Connection connection, String tableName, String schema,
                                                PreparedStatement preparedStatement) throws SQLException {
-        String mysql_column_sql = "SELECT TABLE_NAME,COLUMN_NAME,IS_NULLABLE,DATA_TYPE,COLUMN_TYPE,COLUMN_KEY,COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?";
+        String mysql_column_sql =
+                "SELECT TABLE_NAME,COLUMN_NAME,IS_NULLABLE,DATA_TYPE,COLUMN_TYPE,COLUMN_KEY,COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND TABLE_SCHEMA=?";
         preparedStatement = connection.prepareStatement(mysql_column_sql);
         preparedStatement.setString(1, tableName);
+        preparedStatement.setString(2,schema);
         ResultSet rst = preparedStatement.executeQuery();
         List<ColumnInfo> tableList = new ArrayList<ColumnInfo>();
         ColumnInfo info;
