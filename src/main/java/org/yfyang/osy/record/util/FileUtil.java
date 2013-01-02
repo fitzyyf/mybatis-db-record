@@ -5,6 +5,11 @@
 package org.yfyang.osy.record.util;
 
 import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
+
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 
 /**
  * .
@@ -62,7 +67,7 @@ public class FileUtil {
      * @return 路径
      */
     public static String createXmlFolder(String folderPath, String packageName) {
-        folderPath = generatPackageFileFloder(folderPath + "/resources/", packageName);
+        folderPath = generatPackageFileFloder(folderPath + File.separator+ "resources" + File.separator, packageName);
         File file = new File(folderPath);
         if (!file.exists()) {
             file.mkdirs();
@@ -80,7 +85,7 @@ public class FileUtil {
     public static String generatPackageFileFloder(String floderPath, String packageName) {
         String[] pgs = packageName.split("[.]");
         for (String pg : pgs) {
-            floderPath += ("/" + pg);
+            floderPath += (File.separator + pg);
         }
         return floderPath;
     }
@@ -93,7 +98,13 @@ public class FileUtil {
      * @return 资源文件的文件系统路径
      */
     public static String getClassPath(String resource) {
-        String result = FileUtil.class.getClassLoader().getResource(resource).getPath();
+		URL url = Resources.getResource(resource);
+		try {
+			return Resources.toString(url, Charset.forName("UTF-8"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String result = FileUtil.class.getClassLoader().getResource(resource).getPath();
         int location = result.indexOf("!/");
         return location != -1 ? result.substring(0, location) : result;
     }

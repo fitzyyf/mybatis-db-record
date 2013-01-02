@@ -1,6 +1,11 @@
 package org.yfyang.osy.record.util;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
+import java.nio.charset.Charset;
+
+import com.google.common.io.Resources;
 
 /**
  * 读取Mapper模板和XML模板信息内容，读取完成后，并实例化到内存中.
@@ -11,8 +16,6 @@ import java.io.Serializable;
  * @since JDK 1.0
  */
 public class TemplateSM implements Serializable {
-    private static final long serialVersionUID = -2380088637065148571L;
-
     /**
      * Mapper接口的模板信息
      */
@@ -21,21 +24,30 @@ public class TemplateSM implements Serializable {
      * XML模板信息
      */
     public static final String XML_TEMP;
-
     static {
         MAPPER_TEMP = readMapperTemp();
         XML_TEMP = readXmlTemp();
     }
 
-    /**
-     * 读取Mapper模板信息
-     *
-     * @return Mapper模板信息
-     */
+	private static final long serialVersionUID = -2380088637065148571L;
+
+	private TemplateSM() {
+	}
+
+	/**
+	 * 读取Mapper模板信息
+	 *
+	 * @return Mapper模板信息
+	 */
     private static String readMapperTemp() {
-        String path = FileUtil.getClassPath("mappertmp.txt");
-        return FileUtil.readFileContent(path);
-    }
+		URL url = Resources.getResource("mappertmp.txt");
+		try {
+			return Resources.toString(url, Charset.forName("UTF-8"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
 
     /**
      * 读取Mybatis的XML模板文件信息
@@ -43,10 +55,12 @@ public class TemplateSM implements Serializable {
      * @return XML模板信息
      */
     private static String readXmlTemp() {
-        String path = FileUtil.getClassPath("mybatis.txt");
-        return FileUtil.readFileContent(path);
-    }
-
-    private TemplateSM() {
-    }
+		URL url = Resources.getResource("mybatis.txt");
+		try {
+			return Resources.toString(url, Charset.forName("UTF-8"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
 }
