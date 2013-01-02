@@ -105,7 +105,7 @@ public class SqlOperator {
         String columnName;
         ColumnInfo priColumn = null;
         for (ColumnInfo columnInfo : tableInfo.getColumnList()) {
-            clsPro = StringUtil.columnToPropertis(columnInfo.getColumnName());
+            clsPro = StringUtil.columnToProperty(columnInfo.getColumnName());
             columnName = columnInfo.getColumnName().toUpperCase();
             if (columnInfo.isPri()) {//主键
                 priColumn = columnInfo;//当前为主键

@@ -78,7 +78,7 @@ public class StringUtil {
         properties = properties.toLowerCase();
         return properties.contains(TABLE_SPLIT) ?
                 toSplitChar(properties, false) :
-                EnglishDict.dictReplace(properties);
+                StringUtils.uncapitalize(properties);
     }
 
     /**
@@ -87,12 +87,12 @@ public class StringUtil {
      * @param columnName 表的字段名称
      * @return 字段名称为属性驼峰形式
      */
-    public static String columnToPropertis(String columnName) {
+    public static String columnToProperty(String columnName) {
         columnName = columnName.toLowerCase();
         if (columnName.contains(TABLE_SPLIT)) {
             return toSplitChar(columnName, false);
         } else {
-            return EnglishDict.dictReplace(columnName.toLowerCase());
+            return StringUtils.uncapitalize(columnName);
         }
     }
 

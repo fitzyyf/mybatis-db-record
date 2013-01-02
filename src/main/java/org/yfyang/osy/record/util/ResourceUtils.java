@@ -38,14 +38,6 @@ public final class ResourceUtils {
 		}
 	}
 
-	public JdbcInfo getJdbcInfo() {
-		return DEFAULT_JDBC_INFO;
-	}
-
-	public ProjectInfo getProjectInfo() {
-		return PROJECT_INFO;
-	}
-
 	/**
 	 * 读取数据库类型与JDBC类型对应关照配置文件信息。
 	 *
@@ -55,7 +47,7 @@ public final class ResourceUtils {
 		Properties config = new Properties();
 		InputStream in = null;
 		try {
-			in = ResourceUtils.class.getClassLoader().getResourceAsStream("datatype");
+			in = this.getClass().getClassLoader().getResourceAsStream("datatype.properties");
 			config.load(in);
 			return config;
 		} catch (IOException e) {
@@ -69,7 +61,6 @@ public final class ResourceUtils {
 	}
 
     public ProjectInfo getProject() {
-        System.out.println(PROJECT_INFO);
         return PROJECT_INFO;
     }
 
