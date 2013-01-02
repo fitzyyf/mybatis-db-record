@@ -1,5 +1,7 @@
 package org.yfyang.osy.record.generate;
 
+import java.io.File;
+
 import org.apache.commons.lang3.StringUtils;
 import org.yfyang.osy.record.App;
 import org.yfyang.osy.record.common.Constants;
@@ -35,7 +37,8 @@ public class BuilderEntity {
      * @return 是否操作成功
      */
     public static boolean generateCode(TableInfo tableInfo, String classPath) {
-        String className = StringUtil.tableNameToClass(tableInfo.getTableName());//实体类名
+		//实体类名
+        String className = StringUtil.tableNameToClass(tableInfo.getTableName());
         StringBuilder builder = new StringBuilder();
         StringBuilder getSet = new StringBuilder();
         String dataTime = DatetimeUtil.dateTime();
@@ -57,9 +60,7 @@ public class BuilderEntity {
 			getName = StringUtils.equalsIgnoreCase("boolean",columnInfo.getDataType()) ?
 					StringUtil.getSetMethod(clsPro, IS_NAME) :
 					StringUtil.getSetMethod(clsPro, GET_NAME);
-			builder.append("    /**\n");
-			builder.append("     *").append(columnInfo.getColumnComment()).append("\n");
-            builder.append("     */\n");
+			builder.append("    /** ").append(columnInfo.getColumnComment()).append(" */\n");
             builder.append("    private ").append(columnInfo.getDataType()).append(" ").append(clsPro).append(";\n");
             //get
             getSet.append("    /**\n");
@@ -86,7 +87,7 @@ public class BuilderEntity {
         builder.append("}");
         String packageName = Constants.PROJECT_INFO.getPackageName() + ".domain";
         classPath = FileUtil.createJavaFolder(classPath, packageName);
-        String filePath = classPath + "/" + className + ".java";
+        String filePath = classPath + File.separator + className + ".java";
 		String header = App.getInfo().getCodeTemplate()
 				.replace("${name}", className).replace("${datetime}", dataTime)
                 .replace("${package}", packageName);

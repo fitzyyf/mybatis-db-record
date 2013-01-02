@@ -1,5 +1,7 @@
 package org.yfyang.osy.record.generate;
 
+import java.io.File;
+
 import org.yfyang.osy.record.common.Constants;
 import org.yfyang.osy.record.db.impl.TableInfoDao;
 import org.yfyang.osy.record.model.SqlModal;
@@ -43,10 +45,10 @@ public class BuildMapper {
                         converSqlArray(sql, packageMapper, className));
 
         String mapperName = createMapperName(className);
-        String filePath = xmlPath + "/" + mapperName + ".xml";
+        String filePath = xmlPath + File.separator + mapperName + ".xml";
         if (FileUtil.createClassFile(content, filePath)) {
             classPath = FileUtil.createJavaFolder(classPath, packageName);
-            filePath = classPath + "/" + mapperName + ".java";
+            filePath = classPath + File.separator + mapperName + ".java";
             String dataTime = DatetimeUtil.dateTime();
             content = StringUtil.replace(TemplateSM.MAPPER_TEMP, Constants.MAPPER_TEMP,
                     new String[]{
