@@ -58,7 +58,7 @@ public class StringUtil {
      * @return 转换为类名
      */
     public static String tableNameToClass(String tableName) {
-        tableName = tableName.toUpperCase();
+        tableName = tableName.toLowerCase();
         tableName = tableName.substring(tableName.lastIndexOf(Constants.PROJECT_INFO.getBizTable()) + 1);
         if (tableName.contains(TABLE_SPLIT)) {
             return toSplitChar(tableName, true);

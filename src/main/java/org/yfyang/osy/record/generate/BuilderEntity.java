@@ -1,5 +1,6 @@
 package org.yfyang.osy.record.generate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.yfyang.osy.record.App;
 import org.yfyang.osy.record.common.Constants;
 import org.yfyang.osy.record.model.ColumnInfo;
@@ -38,9 +39,9 @@ public class BuilderEntity {
         StringBuilder builder = new StringBuilder();
         StringBuilder getSet = new StringBuilder();
         String dataTime = DatetimeUtil.dateTime();
-        System.out.println("NOO代码工具:" + dataTime + ",正在生成表：" + tableInfo + "的实体类");
+        System.out.println("A simplified version of the code entities Tools:" + dataTime + ",generate：" + tableInfo + " domain class.");
         builder.append("/**\n");
-		builder.append(" * ").append(tableInfo.getTableComment()).append(" 实体.\n");
+		builder.append(" * ").append(tableInfo.getTableComment()).append(" domain.\n");
 		builder.append(" * <br/>\n");
         builder.append(" * \n");
         builder.append(" * @author ").append(Constants.PROJECT_INFO.getUser()).append("\n");
@@ -53,7 +54,7 @@ public class BuilderEntity {
         for (ColumnInfo columnInfo : tableInfo.getColumnList()) {
             clsPro = StringUtil.columnToProperty(columnInfo.getColumnName());
 			setName = StringUtil.getSetMethod(clsPro, SET_NAME);
-			getName = columnInfo.getDataType().equals("boolean") ?
+			getName = StringUtils.equalsIgnoreCase("boolean",columnInfo.getDataType()) ?
 					StringUtil.getSetMethod(clsPro, IS_NAME) :
 					StringUtil.getSetMethod(clsPro, GET_NAME);
 			builder.append("    /**\n");
