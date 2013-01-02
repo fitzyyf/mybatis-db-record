@@ -1,0 +1,61 @@
+/*
+* Copyright (c) 2010-2011 mumu.
+* [Project:${project},Id:${className}.java  ${datatime} ${author} ]
+*/
+package ${package};
+
+import ${domain};
+import java.util.List;
+import java.util.Map;
+/**
+* ${mapperdesc} Mybatis Mapper接口类.
+* <br/>
+*
+* @author ${author}
+* @version 1.0 ${datatime}
+* @since JDK 1.5
+*/
+public interface ${className} {
+
+/**
+* 向数据库表${tableName}增加一条信息。
+* @param ${domainParam} ${tableName}数据信息
+* @return 返回大于0的数字表示数据库新增成功，否则表示新增失败
+*/
+int insert${domainName}(${domainName} ${domainParam});
+
+/**
+* 取得表${tableName}记录总数。
+* @return 表${tableName}记录总数。
+*/
+long count${domainName}();
+
+/**
+* 取得表${tableName}所有的信息。支持分页操作，如果要查询全部，则传递一个空的Map即可。
+* @param limitParamt 分页中的起始标记,必须包含的Key为start,end.
+* @return 分页获取表${tableName}的所有记录<br/>
+*         如果要获取全部，则传递一个空的Map即可。
+*/
+List<${domainName}> selectOwn${domainName}(Map<String,Object> limitParamt);
+
+/**
+* 根据给定的主键值向数据库表${tableName}删除一条信息。
+* @param id 表ID主键值
+* @return 返回大于0的数字表示数据库删除成功，否则表示删除失败
+*/
+int delete${domainName}(long id);
+
+/**
+* 根据给定的主键值更新数据库表${tableName}的一条信息。
+* @param ${domainParam} 包含主键值的${tableName}数据信息
+* @return 返回大于0的数字表示数据库更新成功，否则表示更新失败
+*/
+int update${domainName}(${domainName} ${domainParam});
+
+/**
+* 根据给定的主键值取得表${tableName}对应的记录。
+* @param id 表ID主键值
+* @return 主键为<code>id</code>的数据信息
+*/
+${domainName} selectOne${domainName}(long id);
+}
